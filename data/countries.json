@@ -1,0 +1,142 @@
+[
+  {
+    "id": "380",
+    "iso2": "it",
+    "name": "Italy",
+    "capital": "Rome",
+    "difficulty": "easy",
+    "proverbs": [
+      "All roads lead to Rome.",
+      "A calm sea never made a skilled sailor.",
+      "He who goes slowly, goes safely and goes far.",
+      "Love and a cough cannot be hidden.",
+      "At the end of the game, the king and the pawn go into the same box."
+    ],
+    "famousPeople": [
+      "Leonardo da Vinci",
+      "Galileo Galilei",
+      "Michelangelo",
+      "Federico Fellini",
+      "Luciano Pavarotti"
+    ],
+    "dishes": [
+      "Risotto alla Milanese",
+      "Tiramisu",
+      "Spaghetti alla Carbonara",
+      "Lasagna",
+      "Arancini"
+    ]
+  },
+  {
+    "id": "392",
+    "iso2": "jp",
+    "name": "Japan",
+    "capital": "Tokyo",
+    "difficulty": "easy",
+    "proverbs": [
+      "Fall seven times, stand up eight.",
+      "Even monkeys fall from trees.",
+      "The nail that sticks out gets hammered down.",
+      "A frog in a well does not know the great ocean.",
+      "One kind word can warm three winter months."
+    ],
+    "famousPeople": [
+      "Hayao Miyazaki",
+      "Akira Kurosawa",
+      "Haruki Murakami",
+      "Katsushika Hokusai",
+      "Shigeru Miyamoto"
+    ],
+    "dishes": [
+      "Ramen",
+      "Okonomiyaki",
+      "Takoyaki",
+      "Tempura",
+      "Matcha Mochi"
+    ]
+  },
+  {
+    "id": "076",
+    "iso2": "br",
+    "name": "Brazil",
+    "capital": "Brasília",
+    "difficulty": "medium",
+    "proverbs": [
+      "A sleeping shrimp gets carried away by the tide.",
+      "Soft water hits hard stone until it drills a hole.",
+      "He who has no dog hunts with a cat.",
+      "The parrot eats the corn, while the parakeet takes the fame.",
+      "He who laughs too fast cries slowly."
+    ],
+    "famousPeople": [
+      "Pelé",
+      "Ayrton Senna",
+      "Paulo Coelho",
+      "Oscar Niemeyer",
+      "Gisele Bündchen"
+    ],
+    "dishes": [
+      "Feijoada",
+      "Pão de Queijo",
+      "Brigadeiro",
+      "Moqueca",
+      "Churrasco"
+    ]
+  },
+  {
+    "id": "818",
+    "iso2": "eg",
+    "name": "Egypt",
+    "capital": "Cairo",
+    "difficulty": "medium",
+    "proverbs": [
+      "Whoever drinks from the Nile will always return.",
+      "Man fears time, yet time fears the pyramids.",
+      "An old friend is worth more than new gold.",
+      "The winds do not always blow as the ships desire.",
+      "He who fears his own shadow cannot walk in the sun."
+    ],
+    "famousPeople": [
+      "Cleopatra",
+      "Naguib Mahfouz",
+      "Umm Kulthum",
+      "Mohamed Salah",
+      "Omar Sharif"
+    ],
+    "dishes": [
+      "Koshari",
+      "Ful Medames",
+      "Molokhia",
+      "Ta'ameya",
+      "Om Ali"
+    ]
+  },
+  {
+    "id": "604",
+    "iso2": "pe",
+    "name": "Peru",
+    "capital": "Lima",
+    "difficulty": "hard",
+    "proverbs": [
+      "No matter how tall the mountain, the path finds a way around it.",
+      "Do not steal, do not lie, do not be lazy (Inca maxim).",
+      "Into the nest of a sleeping bird blows the wind.",
+      "The condor flies high, yet never forgets to look at the earth.",
+      "A burden shared together does not bend the shoulder."
+    ],
+    "famousPeople": [
+      "Mario Vargas Llosa",
+      "Pachacuti",
+      "Yma Sumac",
+      "Gastón Acurio",
+      "Claudio Pizarro"
+    ],
+    "dishes": [
+      "Ceviche",
+      "Lomo Saltado",
+      "Aji de Gallina",
+      "Anticuchos",
+      "Causa Rellena"
+    ]
+  }
+]

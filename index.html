@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CultureGlobe 3D — GeoGame</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Top HUD -->
+  <header class="hud">
+    <div class="hud-brand">
+      <h1>CultureGlobe 3D</h1>
+      <span id="difficulty-badge" class="badge">READY</span>
+    </div>
+
+    <div class="hud-stats">
+      <div class="stat-box">
+        <span class="stat-label">ROUND</span>
+        <span id="round-display" class="stat-value">1 / 5</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">TIME</span>
+        <span id="timer-display" class="stat-value">30s</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">LIVES</span>
+        <span id="lives-display" class="stat-value lives"></span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">SCORE</span>
+        <span id="score-display" class="stat-value">0</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">BEST</span>
+        <span id="highscore-display" class="stat-value accent">0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Countdown progress bar -->
+  <div class="timer-track">
+    <div id="timer-bar" class="timer-bar"></div>
+  </div>
+
+  <!-- Main Workspace -->
+  <main class="workspace">
+    <!-- Left Panel: Clues, Jokers, Spatial Feedback -->
+    <aside class="panel">
+      <section class="clues-section">
+        <h2>Cultural Clues</h2>
+
+        <div class="clue-card">
+          <span class="clue-tag">PROVERB / IDIOM</span>
+          <p id="clue-proverb">Click Start Game to reveal your first country.</p>
+        </div>
+
+        <div class="clue-card">
+          <span class="clue-tag">FAMOUS FIGURE</span>
+          <p id="clue-person">—</p>
+        </div>
+
+        <div class="clue-card">
+          <span class="clue-tag">SIGNATURE DISH</span>
+          <p id="clue-dish">—</p>
+        </div>
+      </section>
+
+      <!-- Jokers (-10s penalty) -->
+      <section class="joker-section">
+        <div class="joker-header">
+          <h3>Jokers <span class="penalty-tag">-10s each</span></h3>
+          <span id="jokers-left">2 left</span>
+        </div>
+
+        <div class="joker-buttons">
+          <button id="joker-flag-btn" class="btn btn-secondary" disabled>
+            Reveal Flag (-10s)
+          </button>
+          <button id="joker-capital-btn" class="btn btn-secondary" disabled>
+            Reveal Capital (-10s)
+          </button>
+        </div>
+
+        <div id="joker-reveal-area" class="joker-reveal hidden"></div>
+      </section>
+
+      <!-- Spatial Feedback Box -->
+      <section id="feedback-box" class="feedback-box">
+        Rotate the 3D globe and click the matching country.
+      </section>
+
+      <!-- Round Transition Button -->
+      <button id="next-round-btn" class="btn btn-primary hidden">
+        Next Round →
+      </button>
+    </aside>
+
+    <!-- Right Panel: Interactive 3D Globe -->
+    <section class="globe-stage">
+      <div id="globe-container"></div>
+      <p class="globe-hint">Drag to rotate • Scroll to zoom • Click a country to guess</p>
+    </section>
+  </main>
+
+  <!-- Start Screen Overlay -->
+  <div id="start-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h2>Welcome to CultureGlobe 3D</h2>
+      <p class="modal-subtitle">
+        Identify 5 mystery countries on the 3D globe using cultural clues before time runs out.
+      </p>
+      <ul class="rules-list">
+        <li><strong>5 Progressive Rounds:</strong> Easy → Medium → Hard.</li>
+        <li><strong>30 Seconds per Round:</strong> Faster guesses earn higher speed bonuses.</li>
+        <li><strong>3 Lives:</strong> Wrong guesses show distance &amp; compass direction to the target.</li>
+        <li><strong>2 Jokers Total:</strong> Spend <strong>-10s</strong> to reveal the flag or capital (requires &gt;10s left).</li>
+      </ul>
+      <button id="start-game-btn" class="btn btn-primary btn-large" disabled>
+        Loading Globe...
+      </button>
+    </div>
+  </div>
+
+  <!-- Game Over Summary Overlay -->
+  <div id="gameover-modal" class="modal-overlay hidden">
+    <div class="modal-card modal-wide">
+      <h2 id="gameover-title">Game Complete!</h2>
+      <div class="final-scores">
+        <div>
+          <span class="stat-label">FINAL SCORE</span>
+          <strong id="final-score">0</strong>
+        </div>
+        <div>
+          <span class="stat-label">HIGH SCORE</span>
+          <strong id="final-highscore" class="accent">0</strong>
+        </div>
+      </div>
+
+      <ul id="round-summary-list" class="summary-list"></ul>
+
+      <!-- Reserved for Step 5: Chart.js -->
+      <div id="chart-wrapper" class="chart-wrapper hidden">
+        <canvas id="results-chart"></canvas>
+      </div>
+
+      <button id="play-again-btn" class="btn btn-primary btn-large">
+        Play Again
+      </button>
+    </div>
+  </div>
+
+  <!-- D3.js & TopoJSON -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+
+  <!-- App entry point -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
