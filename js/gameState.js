@@ -1,42 +1,75 @@
-const HIGH_SCORE_KEY = "geogame_3d_high_score";
-const ROUND_TIME_LIMIT = 30;
-const JOKER_TIME_PENALTY = 10;
-const INITIAL_LIVES = 3;
-const INITIAL_JOKERS = 2;
-const TOTAL_ROUNDS = 5;
+/**
+ * CultureGlobe 3D — Closure-Based Game Engine
+ * Rules:
+ * - 120s continuous global timer
+ * - Time-based difficulty phases: >60s Easy, >30s Medium, <=30s Hard
+ * - 2 attempts per country (1st miss gives Haversine km + 8-point bearing)
+ * - Flag & Capital hints: -5s timer penalty and -20 pts each (locked if timeLeft <= 5s)
+ * - Scoring: 1st try (100 / 80 / 60), 2nd try (60 / 40 / 20), 2nd miss (0)
+ */
 
-// --- Spatial Math Helpers (Haversine distance & compass bearing) ---
+const TOTAL_TIME_SECONDS = 120;
+const MAX_ATTEMPTS = 2;
+const BASE_POINTS = 100;
+const SECOND_TRY_PENALTY = 40;
+const HINT_TIME_PENALTY = 5;
+const HINT_SCORE_PENALTY = 20;
+const HIGH_SCORE_KEY = "cultureglobe3d_highscore_2min";
 
-function toRadians(deg) {
+function shuffle(array) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function pickRandom(list) {
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function normalizeId(id) {
+  return String(id).padStart(3, "0");
+}
+
+function toRad(deg) {
   return (deg * Math.PI) / 180;
 }
 
-export function calculateDistanceKm([lon1, lat1], [lon2, lat2]) {
-  const R = 6371; // Earth radius in km
-  const dLat = toRadians(lat2 - lat1);
-  const dLon = toRadians(lon2 - lon1);
+function toDeg(rad) {
+  return (rad * 180) / Math.PI;
+}
 
+export function calculateDistanceKm(fromCoords, toCoords) {
+  const [lon1, lat1] = fromCoords;
+  const [lon2, lat2] = toCoords;
+  const R = 6371;
+
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRadians(lat1)) *
-      Math.cos(toRadians(lat2)) *
-      Math.sin(dLon / 2) ** 2;
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return Math.round(R * c);
 }
 
-export function calculateDirection([lon1, lat1], [lon2, lat2]) {
-  const lat1Rad = toRadians(lat1);
-  const lat2Rad = toRadians(lat2);
-  const dLon = toRadians(lon2 - lon1);
+export function calculateDirection(fromCoords, toCoords) {
+  const [lon1, lat1] = fromCoords;
+  const [lon2, lat2] = toCoords;
 
-  const y = Math.sin(dLon) * Math.cos(lat2Rad);
+  const phi1 = toRad(lat1);
+  const phi2 = toRad(lat2);
+  const dLambda = toRad(lon2 - lon1);
+
+  const y = Math.sin(dLambda) * Math.cos(phi2);
   const x =
-    Math.cos(lat1Rad) * Math.sin(lat2Rad) -
-    Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
+    Math.cos(phi1) * Math.sin(phi2) -
+    Math.sin(phi1) * Math.cos(phi2) * Math.cos(dLambda);
 
-  const bearing = ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360;
+  const bearing = (toDeg(Math.atan2(y, x)) + 360) % 360;
   const directions = [
     { label: "North", arrow: "↑" },
     { label: "Northeast", arrow: "↗" },
@@ -52,261 +85,376 @@ export function calculateDirection([lon1, lat1], [lon2, lat2]) {
   return directions[index];
 }
 
-// --- Randomization Helpers ---
-
-function shuffle(array) {
-  const copy = [...array];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
+function loadHighScore() {
+  try {
+    const saved = Number(localStorage.getItem(HIGH_SCORE_KEY));
+    return Number.isFinite(saved) && saved > 0 ? saved : 0;
+  } catch {
+    return 0;
   }
-  return copy;
 }
 
-function pickRandom(array) {
-  return array[Math.floor(Math.random() * array.length)];
-}
-
-function buildOrderedRounds(allCountries) {
-  const easy = shuffle(allCountries.filter((c) => c.difficulty === "easy"));
-  const medium = shuffle(allCountries.filter((c) => c.difficulty === "medium"));
-  const hard = shuffle(allCountries.filter((c) => c.difficulty === "hard"));
-
-  // Progressive difficulty: 2 easy -> 2 medium -> 1 hard
-  const selected = [
-    ...easy.slice(0, 2),
-    ...medium.slice(0, 2),
-    ...hard.slice(0, 1)
-  ];
-
-  // Fallback if dataset has fewer items in a specific bucket
-  if (selected.length < TOTAL_ROUNDS) {
-    const selectedIds = new Set(selected.map((c) => c.id));
-    const remaining = shuffle(allCountries.filter((c) => !selectedIds.has(c.id)));
-    selected.push(...remaining.slice(0, TOTAL_ROUNDS - selected.length));
+function saveHighScore(value) {
+  try {
+    localStorage.setItem(HIGH_SCORE_KEY, String(value));
+  } catch {
+    // Ignore storage restrictions
   }
-
-  return selected.map((country) => ({
-    country,
-    clues: {
-      proverb: pickRandom(country.proverbs),
-      famousPerson: pickRandom(country.famousPeople),
-      dish: pickRandom(country.dishes)
-    }
-  }));
 }
-
-// --- Main Closure-Based Game State Manager ---
 
 export function createGameState(allCountries) {
-  // Private encapsulated state (inaccessible from outside)
+  // Private closure state
+  let pools = { easy: [], medium: [], hard: [] };
   let score = 0;
-  let highScore = Number(localStorage.getItem(HIGH_SCORE_KEY)) || 0;
-  let lives = INITIAL_LIVES;
-  let jokersLeft = INITIAL_JOKERS;
-  let timeLeft = ROUND_TIME_LIMIT;
-  let currentRoundIndex = 0;
-  let rounds = [];
-  let roundActive = false;
+  let highScore = loadHighScore();
+  let isNewRecord = false;
+  let timeLeft = TOTAL_TIME_SECONDS;
+  let gameRunning = false;
   let gameOver = false;
-  let usedJokersThisRound = new Set();
-  let wrongGuessesThisRound = new Set();
-  let roundHistory = [];
 
-  function saveHighScoreIfBeaten() {
+  let questionNumber = 0;
+  let currentQuestion = null;
+  let questionActive = false;
+  let attemptsUsed = 0;
+  let wrongGuessesThisQuestion = new Set();
+  let usedHintsThisQuestion = { flag: false, capital: false };
+  let questionHistory = [];
+
+  function getDifficultyByTime(seconds) {
+    if (seconds > 60) return "easy";
+    if (seconds > 30) return "medium";
+    return "hard";
+  }
+
+  function getHintsUsedCount() {
+    return (usedHintsThisQuestion.flag ? 1 : 0) + (usedHintsThisQuestion.capital ? 1 : 0);
+  }
+
+  function computePotentialPoints() {
+    if (!currentQuestion || !questionActive) return 0;
+    const raw =
+      BASE_POINTS -
+      attemptsUsed * SECOND_TRY_PENALTY -
+      getHintsUsedCount() * HINT_SCORE_PENALTY;
+    return Math.max(20, raw);
+  }
+
+  function drawNextCountry() {
+    const targetDiff = getDifficultyByTime(timeLeft);
+    const order =
+      targetDiff === "easy"
+        ? ["easy", "medium", "hard"]
+        : targetDiff === "medium"
+          ? ["medium", "hard", "easy"]
+          : ["hard", "medium", "easy"];
+
+    for (const diff of order) {
+      if (pools[diff].length > 0) {
+        return pools[diff].pop();
+      }
+    }
+    return null;
+  }
+
+  function prepareQuestion(country) {
+    questionNumber += 1;
+    currentQuestion = {
+      country,
+      proverb: pickRandom(country.proverbs),
+      famousPerson: pickRandom(country.famousPeople),
+      dish: pickRandom(country.dishes),
+      difficulty: country.difficulty,
+      startedAtTimeLeft: timeLeft
+    };
+    questionActive = true;
+    attemptsUsed = 0;
+    wrongGuessesThisQuestion = new Set();
+    usedHintsThisQuestion = { flag: false, capital: false };
+  }
+
+  function updateHighScoreIfNeeded() {
     if (score > highScore) {
       highScore = score;
-      localStorage.setItem(HIGH_SCORE_KEY, String(highScore));
+      isNewRecord = true;
+      saveHighScore(highScore);
     }
   }
 
-  function recordRoundResult(solved, pointsEarned) {
-    const current = rounds[currentRoundIndex];
-    roundHistory.push({
-      roundNumber: currentRoundIndex + 1,
-      countryName: current.country.name,
-      difficulty: current.country.difficulty,
-      solved,
-      pointsEarned,
-      timeUsed: ROUND_TIME_LIMIT - timeLeft,
-      wrongAttempts: wrongGuessesThisRound.size
-    });
-  }
-
-  function canUseJoker(type) {
-    return (
-      roundActive &&
-      !gameOver &&
-      jokersLeft > 0 &&
-      timeLeft > JOKER_TIME_PENALTY &&
-      !usedJokersThisRound.has(type)
-    );
+  function buildSnapshot() {
+    const solvedCount = questionHistory.filter((item) => item.solved).length;
+    return {
+      totalTime: TOTAL_TIME_SECONDS,
+      timeLeft,
+      currentPhase: getDifficultyByTime(timeLeft),
+      score,
+      highScore,
+      isNewRecord,
+      gameRunning,
+      gameOver,
+      questionNumber,
+      questionActive,
+      maxAttempts: MAX_ATTEMPTS,
+      attemptsUsed,
+      attemptsLeft: Math.max(0, MAX_ATTEMPTS - attemptsUsed),
+      potentialPoints: computePotentialPoints(),
+      hintTimePenalty: HINT_TIME_PENALTY,
+      canUseFlagHint:
+        gameRunning &&
+        questionActive &&
+        !usedHintsThisQuestion.flag &&
+        timeLeft > HINT_TIME_PENALTY,
+      canUseCapitalHint:
+        gameRunning &&
+        questionActive &&
+        !usedHintsThisQuestion.capital &&
+        timeLeft > HINT_TIME_PENALTY,
+      usedHints: { ...usedHintsThisQuestion },
+      currentQuestion: currentQuestion
+        ? {
+            countryId: currentQuestion.country.id,
+            difficulty: currentQuestion.difficulty,
+            proverb: currentQuestion.proverb,
+            famousPerson: currentQuestion.famousPerson,
+            dish: currentQuestion.dish,
+            iso2: currentQuestion.country.iso2,
+            capital: currentQuestion.country.capital
+          }
+        : null,
+      solvedCount,
+      totalPlayed: questionHistory.length,
+      questionHistory: questionHistory.map((item) => ({ ...item }))
+    };
   }
 
   return {
     startNewGame() {
-      score = 0;
-      lives = INITIAL_LIVES;
-      jokersLeft = INITIAL_JOKERS;
-      currentRoundIndex = 0;
-      rounds = buildOrderedRounds(allCountries);
-      roundHistory = [];
-      gameOver = false;
-      this.startRound();
-      return this.getSnapshot();
-    },
+      pools = {
+        easy: shuffle(allCountries.filter((c) => c.difficulty === "easy")),
+        medium: shuffle(allCountries.filter((c) => c.difficulty === "medium")),
+        hard: shuffle(allCountries.filter((c) => c.difficulty === "hard"))
+      };
 
-    startRound() {
-      timeLeft = ROUND_TIME_LIMIT;
-      roundActive = true;
-      usedJokersThisRound = new Set();
-      wrongGuessesThisRound = new Set();
-      return this.getSnapshot();
+      score = 0;
+      isNewRecord = false;
+      timeLeft = TOTAL_TIME_SECONDS;
+      gameRunning = true;
+      gameOver = false;
+      questionNumber = 0;
+      questionHistory = [];
+
+      const firstCountry = drawNextCountry();
+      if (firstCountry) {
+        prepareQuestion(firstCountry);
+      }
+
+      return buildSnapshot();
     },
 
     tickTimer() {
-      if (!roundActive || gameOver) return { timedOut: false, timeLeft };
+      if (!gameRunning || gameOver) {
+        return { gameOver: false, snapshot: buildSnapshot() };
+      }
 
       timeLeft = Math.max(0, timeLeft - 1);
 
       if (timeLeft === 0) {
-        roundActive = false;
-        lives = Math.max(0, lives - 1);
-        recordRoundResult(false, 0);
+        let timedOutCountry = null;
 
-        if (lives === 0 || currentRoundIndex >= rounds.length - 1) {
-          gameOver = true;
-          saveHighScoreIfBeaten();
+        // If player was still guessing when the 2 minutes expired, log it as missed
+        if (questionActive && currentQuestion) {
+          timedOutCountry = currentQuestion.country;
+          const timeSpent = Math.max(1, currentQuestion.startedAtTimeLeft - timeLeft);
+          questionHistory.push({
+            questionNumber,
+            countryName: currentQuestion.country.name,
+            iso2: currentQuestion.country.iso2,
+            difficulty: currentQuestion.difficulty,
+            solved: false,
+            attemptsUsed,
+            hintsUsed: getHintsUsedCount(),
+            points: 0,
+            timeSpent,
+            outcome: "timeout"
+          });
         }
 
+        questionActive = false;
+        gameRunning = false;
+        gameOver = true;
+        updateHighScoreIfNeeded();
+
         return {
-          timedOut: true,
-          timeLeft: 0,
-          correctCountry: rounds[currentRoundIndex].country,
-          gameOver
+          gameOver: true,
+          timedOutCountry,
+          snapshot: buildSnapshot()
         };
       }
 
-      return { timedOut: false, timeLeft };
+      return {
+        gameOver: false,
+        snapshot: buildSnapshot()
+      };
     },
 
-    submitGuess(clickedCountry, targetCentroid) {
-      if (!roundActive || gameOver) {
-        return { status: "ignored" };
+    submitGuess(clickedId, clickedName, clickedCoords, targetCoords) {
+      if (!gameRunning || !questionActive || !currentQuestion) {
+        return { status: "ignored", snapshot: buildSnapshot() };
       }
 
-      const target = rounds[currentRoundIndex].country;
+      const normClicked = normalizeId(clickedId);
+      const normTarget = normalizeId(currentQuestion.country.id);
+
+      if (wrongGuessesThisQuestion.has(normClicked)) {
+        return {
+          status: "duplicate",
+          clickedId: normClicked,
+          clickedName,
+          snapshot: buildSnapshot()
+        };
+      }
+
+      attemptsUsed += 1;
+      const hintsCount = getHintsUsedCount();
 
       // Correct guess
-      if (clickedCountry.id === target.id) {
-        roundActive = false;
-        const pointsEarned = 100 + timeLeft * 10;
-        score += pointsEarned;
-        recordRoundResult(true, pointsEarned);
-        saveHighScoreIfBeaten();
+      if (normClicked === normTarget) {
+        const earned = Math.max(
+          20,
+          BASE_POINTS -
+            (attemptsUsed - 1) * SECOND_TRY_PENALTY -
+            hintsCount * HINT_SCORE_PENALTY
+        );
+        score += earned;
+        updateHighScoreIfNeeded();
 
-        const isLastRound = currentRoundIndex >= rounds.length - 1;
-        if (isLastRound) {
-          gameOver = true;
-        }
+        const timeSpent = Math.max(1, currentQuestion.startedAtTimeLeft - timeLeft);
+        questionHistory.push({
+          questionNumber,
+          countryName: currentQuestion.country.name,
+          iso2: currentQuestion.country.iso2,
+          difficulty: currentQuestion.difficulty,
+          solved: true,
+          attemptsUsed,
+          hintsUsed: hintsCount,
+          points: earned,
+          timeSpent,
+          outcome: "solved"
+        });
+
+        questionActive = false;
 
         return {
           status: "correct",
-          pointsEarned,
-          targetCountry: target,
-          gameOver
+          points: earned,
+          attemptsUsed,
+          hintsUsed: hintsCount,
+          targetCountry: currentQuestion.country,
+          snapshot: buildSnapshot()
         };
       }
 
-      // Prevent deducting a life twice for the same wrong country in one round
-      if (wrongGuessesThisRound.has(clickedCountry.id)) {
-        return { status: "already_guessed", clickedName: clickedCountry.name };
-      }
-
-      wrongGuessesThisRound.add(clickedCountry.id);
-      lives = Math.max(0, lives - 1);
-
+      // Wrong guess
+      wrongGuessesThisQuestion.add(normClicked);
       const distanceKm =
-        clickedCountry.centroid && targetCentroid
-          ? calculateDistanceKm(clickedCountry.centroid, targetCentroid)
+        clickedCoords && targetCoords
+          ? calculateDistanceKm(clickedCoords, targetCoords)
           : null;
-
       const direction =
-        clickedCountry.centroid && targetCentroid
-          ? calculateDirection(clickedCountry.centroid, targetCentroid)
+        clickedCoords && targetCoords
+          ? calculateDirection(clickedCoords, targetCoords)
           : null;
 
-      if (lives === 0) {
-        roundActive = false;
-        gameOver = true;
-        recordRoundResult(false, 0);
-        saveHighScoreIfBeaten();
+      // 1st wrong guess -> player gets 2nd try with spatial hint
+      if (attemptsUsed < MAX_ATTEMPTS) {
+        return {
+          status: "wrong_retry",
+          clickedId: normClicked,
+          clickedName,
+          distanceKm,
+          direction,
+          snapshot: buildSnapshot()
+        };
       }
+
+      // 2nd wrong guess -> reveal answer and unlock Next Question
+      const timeSpent = Math.max(1, currentQuestion.startedAtTimeLeft - timeLeft);
+      questionHistory.push({
+        questionNumber,
+        countryName: currentQuestion.country.name,
+        iso2: currentQuestion.country.iso2,
+        difficulty: currentQuestion.difficulty,
+        solved: false,
+        attemptsUsed,
+        hintsUsed: hintsCount,
+        points: 0,
+        timeSpent,
+        outcome: "missed"
+      });
+
+      questionActive = false;
 
       return {
-        status: "wrong",
-        clickedName: clickedCountry.name,
+        status: "wrong_failed",
+        clickedId: normClicked,
+        clickedName,
         distanceKm,
         direction,
-        targetCountry: lives === 0 ? target : null,
-        gameOver
+        targetCountry: currentQuestion.country,
+        snapshot: buildSnapshot()
       };
     },
 
-    useJoker(type) {
-      // type: "flag" | "capital"
-      if (!canUseJoker(type)) {
-        return { allowed: false };
+    useHint(type) {
+      if (!gameRunning || !questionActive || !currentQuestion) {
+        return { ok: false, reason: "inactive", snapshot: buildSnapshot() };
       }
 
-      jokersLeft -= 1;
-      timeLeft = Math.max(1, timeLeft - JOKER_TIME_PENALTY);
-      usedJokersThisRound.add(type);
+      if (type !== "flag" && type !== "capital") {
+        return { ok: false, reason: "invalid", snapshot: buildSnapshot() };
+      }
 
-      const target = rounds[currentRoundIndex].country;
+      if (usedHintsThisQuestion[type]) {
+        return { ok: false, reason: "already_used", snapshot: buildSnapshot() };
+      }
+
+      if (timeLeft <= HINT_TIME_PENALTY) {
+        return { ok: false, reason: "low_time", snapshot: buildSnapshot() };
+      }
+
+      timeLeft -= HINT_TIME_PENALTY;
+      usedHintsThisQuestion[type] = true;
+
       return {
-        allowed: true,
+        ok: true,
         type,
+        penaltySeconds: HINT_TIME_PENALTY,
         value:
           type === "flag"
-            ? `https://flagcdn.com/w160/${target.iso2}.png`
-            : target.capital,
-        countryName: target.name,
-        timeLeft,
-        jokersLeft
+            ? currentQuestion.country.iso2
+            : currentQuestion.country.capital,
+        snapshot: buildSnapshot()
       };
     },
 
-    nextRound() {
-      if (currentRoundIndex < rounds.length - 1 && lives > 0) {
-        currentRoundIndex += 1;
-        return this.startRound();
+    nextQuestion() {
+      if (!gameRunning || gameOver || questionActive) {
+        return { ok: false, exhausted: false, snapshot: buildSnapshot() };
       }
-      gameOver = true;
-      saveHighScoreIfBeaten();
-      return this.getSnapshot();
+
+      const nextCountry = drawNextCountry();
+      if (!nextCountry) {
+        gameRunning = false;
+        gameOver = true;
+        updateHighScoreIfNeeded();
+        return { ok: false, exhausted: true, snapshot: buildSnapshot() };
+      }
+
+      prepareQuestion(nextCountry);
+      return { ok: true, exhausted: false, snapshot: buildSnapshot() };
     },
 
     getSnapshot() {
-      const current = rounds[currentRoundIndex] || null;
-      return {
-        score,
-        highScore,
-        lives,
-        maxLives: INITIAL_LIVES,
-        jokersLeft,
-        timeLeft,
-        roundNumber: currentRoundIndex + 1,
-        totalRounds: rounds.length || TOTAL_ROUNDS,
-        roundActive,
-        gameOver,
-        canUseFlagJoker: canUseJoker("flag"),
-        canUseCapitalJoker: canUseJoker("capital"),
-        currentDifficulty: current ? current.country.difficulty : null,
-        currentClues: current ? { ...current.clues } : null,
-        currentTargetId: current ? current.country.id : null,
-        roundHistory: [...roundHistory]
-      };
+      return buildSnapshot();
     }
   };
 }

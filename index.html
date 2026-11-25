@@ -2,159 +2,252 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CultureGlobe 3D — GeoGame</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>CultureGlobe 3D — 2-Minute GeoGame</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Styles -->
   <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js" defer></script>
 </head>
 <body>
-  <!-- Top HUD -->
-  <header class="hud">
-    <div class="hud-brand">
-      <h1>CultureGlobe 3D</h1>
-      <span id="difficulty-badge" class="badge">READY</span>
+  <!-- Fullscreen 3D Globe Background -->
+  <main id="globe-stage" aria-label="Interactive 3D World Globe">
+    <svg id="globe-svg" role="img" aria-label="3D Vector World Globe"></svg>
+
+    <!-- Bottom-Right Floating Globe Controls -->
+    <div id="globe-controls" class="glass-pill" aria-label="Globe Controls">
+      <button id="btn-zoom-in" class="icon-btn" type="button" title="Zoom In" aria-label="Zoom In">+</button>
+      <button id="btn-zoom-out" class="icon-btn" type="button" title="Zoom Out" aria-label="Zoom Out">−</button>
+      <button id="btn-reset-view" class="icon-btn" type="button" title="Reset View" aria-label="Reset View">⟲</button>
     </div>
 
-    <div class="hud-stats">
-      <div class="stat-box">
-        <span class="stat-label">ROUND</span>
-        <span id="round-display" class="stat-value">1 / 5</span>
+    <p class="globe-tip">Drag to rotate · Scroll to zoom · Click a country to guess</p>
+  </main>
+
+  <!-- Top Floating Glass HUD -->
+  <header id="top-hud">
+    <div class="hud-group glass-panel">
+      <div class="brand-block">
+        <span class="brand-dot" aria-hidden="true"></span>
+        <span class="brand-title">CultureGlobe 3D</span>
       </div>
-      <div class="stat-box">
-        <span class="stat-label">TIME</span>
-        <span id="timer-display" class="stat-value">30s</span>
+      <div class="hud-divider"></div>
+      <div class="question-meta">
+        <span id="question-badge" class="mono">Q #1</span>
+        <span id="difficulty-badge" class="diff-badge diff-easy">EASY</span>
       </div>
-      <div class="stat-box">
-        <span class="stat-label">LIVES</span>
-        <span id="lives-display" class="stat-value lives"></span>
+    </div>
+
+    <!-- Center 2-Minute Timer & Phase Bar -->
+    <div class="hud-timer glass-panel">
+      <div class="timer-top-row">
+        <span id="phase-indicator" class="phase-label">Phase 1 · Easy</span>
+        <div class="timer-value-wrap">
+          <span id="timer-display" class="mono timer-value">02:00</span>
+          <span id="timer-penalty-toast" class="penalty-toast" aria-live="polite">-5s</span>
+        </div>
       </div>
-      <div class="stat-box">
+      <div class="timer-track" aria-hidden="true">
+        <div id="timer-bar-fill" class="timer-fill"></div>
+        <span class="phase-marker marker-60" title="Medium Phase (01:00)"></span>
+        <span class="phase-marker marker-30" title="Hard Phase (00:30)"></span>
+      </div>
+    </div>
+
+    <!-- Right Score & Stats -->
+    <div class="hud-stats glass-panel">
+      <div class="stat-item">
         <span class="stat-label">SCORE</span>
-        <span id="score-display" class="stat-value">0</span>
+        <span id="score-value" class="stat-num mono">0</span>
       </div>
-      <div class="stat-box">
+      <div class="hud-divider"></div>
+      <div class="stat-item">
+        <span class="stat-label">SOLVED</span>
+        <span id="solved-count" class="stat-num mono">0</span>
+      </div>
+      <div class="hud-divider"></div>
+      <div class="stat-item">
         <span class="stat-label">BEST</span>
-        <span id="highscore-display" class="stat-value accent">0</span>
+        <span id="highscore-value" class="stat-num mono accent">0</span>
       </div>
     </div>
   </header>
 
-  <!-- Countdown progress bar -->
-  <div class="timer-track">
-    <div id="timer-bar" class="timer-bar"></div>
-  </div>
-
-  <!-- Main Workspace -->
-  <main class="workspace">
-    <!-- Left Panel: Clues, Jokers, Spatial Feedback -->
-    <aside class="panel">
-      <section class="clues-section">
-        <h2>Cultural Clues</h2>
-
-        <div class="clue-card">
-          <span class="clue-tag">PROVERB / IDIOM</span>
-          <p id="clue-proverb">Click Start Game to reveal your first country.</p>
+  <!-- Floating Left Glass Clue Panel -->
+  <aside id="clue-panel" class="glass-panel" aria-label="Country Clues and Controls">
+    <div class="panel-header">
+      <div class="attempts-wrap">
+        <span class="panel-kicker">ATTEMPTS</span>
+        <div id="attempts-display" class="attempt-dots" aria-label="Remaining attempts">
+          <span class="attempt-dot active"></span>
+          <span class="attempt-dot active"></span>
         </div>
-
-        <div class="clue-card">
-          <span class="clue-tag">FAMOUS FIGURE</span>
-          <p id="clue-person">—</p>
+      </div>
+      <div class="panel-header-right">
+        <div class="potential-wrap" title="Points available if guessed now">
+          <span class="panel-kicker">WORTH</span>
+          <span id="potential-points" class="potential-badge mono">+100 pts</span>
         </div>
+        <button id="btn-toggle-panel" class="panel-toggle-btn" type="button" aria-expanded="true">HIDE</button>
+      </div>
+    </div>
 
-        <div class="clue-card">
+    <!-- Cultural Clues -->
+    <section class="clues-stack">
+      <article class="clue-card">
+        <span class="clue-tag">PROVERB / SAYING</span>
+        <p id="clue-proverb" class="clue-text proverb-text">Loading cultural clues...</p>
+      </article>
+
+      <div class="clue-pair">
+        <article class="clue-card">
+          <span class="clue-tag">NOTABLE FIGURE</span>
+          <p id="clue-person" class="clue-text">—</p>
+        </article>
+
+        <article class="clue-card">
           <span class="clue-tag">SIGNATURE DISH</span>
-          <p id="clue-dish">—</p>
-        </div>
-      </section>
-
-      <!-- Jokers (-10s penalty) -->
-      <section class="joker-section">
-        <div class="joker-header">
-          <h3>Jokers <span class="penalty-tag">-10s each</span></h3>
-          <span id="jokers-left">2 left</span>
-        </div>
-
-        <div class="joker-buttons">
-          <button id="joker-flag-btn" class="btn btn-secondary" disabled>
-            Reveal Flag (-10s)
-          </button>
-          <button id="joker-capital-btn" class="btn btn-secondary" disabled>
-            Reveal Capital (-10s)
-          </button>
-        </div>
-
-        <div id="joker-reveal-area" class="joker-reveal hidden"></div>
-      </section>
-
-      <!-- Spatial Feedback Box -->
-      <section id="feedback-box" class="feedback-box">
-        Rotate the 3D globe and click the matching country.
-      </section>
-
-      <!-- Round Transition Button -->
-      <button id="next-round-btn" class="btn btn-primary hidden">
-        Next Round →
-      </button>
-    </aside>
-
-    <!-- Right Panel: Interactive 3D Globe -->
-    <section class="globe-stage">
-      <div id="globe-container"></div>
-      <p class="globe-hint">Drag to rotate • Scroll to zoom • Click a country to guess</p>
+          <p id="clue-dish" class="clue-text">—</p>
+        </article>
+      </div>
     </section>
-  </main>
 
-  <!-- Start Screen Overlay -->
-  <div id="start-modal" class="modal-overlay">
-    <div class="modal-card">
-      <h2>Welcome to CultureGlobe 3D</h2>
+    <!-- Risk-Reward Hint Buttons (-5s / -20 pts) -->
+    <section class="hints-section">
+      <div id="hints-row" class="hints-row">
+        <button id="btn-hint-flag" class="hint-btn" type="button">
+          <span class="hint-btn-title">Reveal Flag</span>
+          <span class="hint-btn-cost mono">-5s · -20 pts</span>
+        </button>
+        <button id="btn-hint-capital" class="hint-btn" type="button">
+          <span class="hint-btn-title">Reveal Capital</span>
+          <span class="hint-btn-cost mono">-5s · -20 pts</span>
+        </button>
+      </div>
+
+      <div id="revealed-hints" class="revealed-hints hidden">
+        <div id="revealed-flag-box" class="revealed-chip hidden"></div>
+        <div id="revealed-capital-box" class="revealed-chip hidden">
+          <span class="revealed-label">CAPITAL</span>
+          <strong id="revealed-capital-text"></strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- Spatial Feedback & Round Result -->
+    <section id="feedback-box" class="feedback-box neutral" aria-live="polite">
+      <div id="feedback-icon" class="feedback-icon">◎</div>
+      <div class="feedback-copy">
+        <strong id="feedback-title">Find the country on the globe</strong>
+        <p id="feedback-detail">You have 2 guesses per country. First miss reveals distance &amp; direction.</p>
+      </div>
+    </section>
+
+    <!-- Next Question CTA -->
+    <button id="btn-next" class="primary-btn next-btn hidden" type="button">
+      <span>Next Question →</span>
+      <kbd class="kbd-chip mono">Enter</kbd>
+    </button>
+  </aside>
+
+  <!-- Start Modal -->
+  <div id="start-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="start-title">
+    <div class="modal-card glass-panel">
+      <span class="modal-eyebrow">2-MINUTE ARCADE GEOGAME</span>
+      <h1 id="start-title" class="modal-title">CultureGlobe 3D</h1>
       <p class="modal-subtitle">
-        Identify 5 mystery countries on the 3D globe using cultural clues before time runs out.
+        Identify as many countries as you can on the 3D globe in <strong>2 minutes</strong> using cultural clues.
       </p>
-      <ul class="rules-list">
-        <li><strong>5 Progressive Rounds:</strong> Easy → Medium → Hard.</li>
-        <li><strong>30 Seconds per Round:</strong> Faster guesses earn higher speed bonuses.</li>
-        <li><strong>3 Lives:</strong> Wrong guesses show distance &amp; compass direction to the target.</li>
-        <li><strong>2 Jokers Total:</strong> Spend <strong>-10s</strong> to reveal the flag or capital (requires &gt;10s left).</li>
-      </ul>
-      <button id="start-game-btn" class="btn btn-primary btn-large" disabled>
-        Loading Globe...
+
+      <div class="rules-grid">
+        <div class="rule-card">
+          <span class="rule-title">Progressive Phases</span>
+          <p><strong>02:00–01:01</strong> Easy · <strong>01:00–00:31</strong> Medium · <strong>00:30–00:00</strong> Hard. Clock never stops!</p>
+        </div>
+        <div class="rule-card">
+          <span class="rule-title">2 Guesses per Country</span>
+          <p>1st miss shows <strong>distance (km) &amp; compass direction</strong>. 2nd miss reveals the country so you can move on.</p>
+        </div>
+        <div class="rule-card">
+          <span class="rule-title">Flag &amp; Capital Hints</span>
+          <p>Each hint costs <strong>-5 seconds</strong> and <strong>-20 points</strong>. Locked when 5 seconds or less remain.</p>
+        </div>
+        <div class="rule-card">
+          <span class="rule-title">Scoring Matrix</span>
+          <p>1st try: <strong>100 / 80 / 60 pts</strong> · 2nd try: <strong>60 / 40 / 20 pts</strong> (depending on 0, 1, or 2 hints used).</p>
+        </div>
+      </div>
+
+      <button id="btn-start" class="primary-btn start-btn" type="button" disabled>
+        Loading 3D Globe...
       </button>
     </div>
   </div>
 
-  <!-- Game Over Summary Overlay -->
-  <div id="gameover-modal" class="modal-overlay hidden">
-    <div class="modal-card modal-wide">
-      <h2 id="gameover-title">Game Complete!</h2>
-      <div class="final-scores">
+  <!-- Game Over Modal -->
+  <div id="gameover-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="gameover-title">
+    <div class="modal-card modal-wide glass-panel">
+      <div class="gameover-header">
         <div>
+          <span class="modal-eyebrow">TIME'S UP</span>
+          <h2 id="gameover-title" class="modal-title">Session Summary</h2>
+          <p id="gameover-subtitle" class="modal-subtitle">2-minute challenge complete.</p>
+        </div>
+        <span id="new-record-badge" class="record-badge hidden">NEW HIGH SCORE</span>
+      </div>
+
+      <div class="summary-stats">
+        <div class="summary-stat">
           <span class="stat-label">FINAL SCORE</span>
-          <strong id="final-score">0</strong>
+          <strong id="final-score" class="mono">0</strong>
         </div>
-        <div>
+        <div class="summary-stat">
           <span class="stat-label">HIGH SCORE</span>
-          <strong id="final-highscore" class="accent">0</strong>
+          <strong id="final-highscore" class="mono accent">0</strong>
+        </div>
+        <div class="summary-stat">
+          <span class="stat-label">SOLVED</span>
+          <strong id="final-solved" class="mono">0 / 0</strong>
+        </div>
+        <div class="summary-stat">
+          <span class="stat-label">ACCURACY</span>
+          <strong id="final-accuracy" class="mono">0%</strong>
         </div>
       </div>
 
-      <ul id="round-summary-list" class="summary-list"></ul>
+      <div class="gameover-body">
+        <div class="chart-card">
+          <span class="clue-tag">POINTS BY QUESTION (GREEN: SOLVED · PINK: MISSED)</span>
+          <div class="chart-canvas-wrap">
+            <canvas id="results-chart"></canvas>
+          </div>
+        </div>
 
-      <!-- Reserved for Step 5: Chart.js -->
-      <div id="chart-wrapper" class="chart-wrapper hidden">
-        <canvas id="results-chart"></canvas>
+        <div class="history-card">
+          <span class="clue-tag">COUNTRIES PLAYED</span>
+          <ul id="summary-list" class="summary-list"></ul>
+        </div>
       </div>
 
-      <button id="play-again-btn" class="btn btn-primary btn-large">
-        Play Again
+      <button id="btn-play-again" class="primary-btn" type="button">
+        Play Another 2-Minute Round
       </button>
     </div>
   </div>
 
-  <!-- D3.js & TopoJSON -->
-  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
-
-  <!-- App entry point -->
+  <!-- App Entry -->
   <script type="module" src="js/main.js"></script>
 </body>
 </html>

@@ -1,297 +1,468 @@
-import { createGlobe } from "./globe.js";
+/**
+ * CultureGlobe 3D — Main Controller & DOM Orchestration
+ * Connects the closure-based 2-minute game engine, D3 3D globe, and Chart.js summary.
+ */
+
 import { createGameState } from "./gameState.js";
+import { createGlobe } from "./globe.js";
+import { renderResultsChart } from "./chart.js";
 
-// --- DOM References ---
-const roundDisplay = document.getElementById("round-display");
-const difficultyBadge = document.getElementById("difficulty-badge");
-const timerDisplay = document.getElementById("timer-display");
-const timerBar = document.getElementById("timer-bar");
-const livesDisplay = document.getElementById("lives-display");
-const scoreDisplay = document.getElementById("score-display");
-const highScoreDisplay = document.getElementById("highscore-display");
+const els = {
+  // HUD
+  questionBadge: document.getElementById("question-badge"),
+  difficultyBadge: document.getElementById("difficulty-badge"),
+  phaseIndicator: document.getElementById("phase-indicator"),
+  timerDisplay: document.getElementById("timer-display"),
+  timerPenaltyToast: document.getElementById("timer-penalty-toast"),
+  timerBarFill: document.getElementById("timer-bar-fill"),
+  scoreValue: document.getElementById("score-value"),
+  solvedCount: document.getElementById("solved-count"),
+  highscoreValue: document.getElementById("highscore-value"),
 
-const clueProverb = document.getElementById("clue-proverb");
-const cluePerson = document.getElementById("clue-person");
-const clueDish = document.getElementById("clue-dish");
+  // Clue Panel
+  cluePanel: document.getElementById("clue-panel"),
+  btnTogglePanel: document.getElementById("btn-toggle-panel"),
+  attemptsDisplay: document.getElementById("attempts-display"),
+  potentialPoints: document.getElementById("potential-points"),
+  clueProverb: document.getElementById("clue-proverb"),
+  cluePerson: document.getElementById("clue-person"),
+  clueDish: document.getElementById("clue-dish"),
 
-const jokersLeftEl = document.getElementById("jokers-left");
-const flagJokerBtn = document.getElementById("joker-flag-btn");
-const capitalJokerBtn = document.getElementById("joker-capital-btn");
-const jokerRevealArea = document.getElementById("joker-reveal-area");
+  // Hints
+  btnHintFlag: document.getElementById("btn-hint-flag"),
+  btnHintCapital: document.getElementById("btn-hint-capital"),
+  revealedHints: document.getElementById("revealed-hints"),
+  revealedFlagBox: document.getElementById("revealed-flag-box"),
+  revealedCapitalBox: document.getElementById("revealed-capital-box"),
+  revealedCapitalText: document.getElementById("revealed-capital-text"),
 
-const feedbackBox = document.getElementById("feedback-box");
-const nextRoundBtn = document.getElementById("next-round-btn");
+  // Feedback & Next
+  feedbackBox: document.getElementById("feedback-box"),
+  feedbackIcon: document.getElementById("feedback-icon"),
+  feedbackTitle: document.getElementById("feedback-title"),
+  feedbackDetail: document.getElementById("feedback-detail"),
+  btnNext: document.getElementById("btn-next"),
 
-const startModal = document.getElementById("start-modal");
-const startGameBtn = document.getElementById("start-game-btn");
-const gameOverModal = document.getElementById("gameover-modal");
-const gameOverTitle = document.getElementById("gameover-title");
-const finalScoreEl = document.getElementById("final-score");
-const finalHighScoreEl = document.getElementById("final-highscore");
-const roundSummaryList = document.getElementById("round-summary-list");
-const playAgainBtn = document.getElementById("play-again-btn");
+  // Globe Controls
+  btnZoomIn: document.getElementById("btn-zoom-in"),
+  btnZoomOut: document.getElementById("btn-zoom-out"),
+  btnResetView: document.getElementById("btn-reset-view"),
 
-let globe = null;
+  // Modals
+  startModal: document.getElementById("start-modal"),
+  btnStart: document.getElementById("btn-start"),
+  gameoverModal: document.getElementById("gameover-modal"),
+  gameoverSubtitle: document.getElementById("gameover-subtitle"),
+  newRecordBadge: document.getElementById("new-record-badge"),
+  finalScore: document.getElementById("final-score"),
+  finalHighscore: document.getElementById("final-highscore"),
+  finalSolved: document.getElementById("final-solved"),
+  finalAccuracy: document.getElementById("final-accuracy"),
+  resultsChart: document.getElementById("results-chart"),
+  summaryList: document.getElementById("summary-list"),
+  btnPlayAgain: document.getElementById("btn-play-again")
+};
+
 let game = null;
+let globe = null;
 let timerInterval = null;
 
-// --- DOM Rendering Helpers ---
+function formatClock(totalSeconds) {
+  const safe = Math.max(0, totalSeconds);
+  const mins = Math.floor(safe / 60);
+  const secs = safe % 60;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+}
 
-function setFeedback(message, type = "neutral") {
-  feedbackBox.textContent = message;
-  feedbackBox.className = "feedback-box";
-  if (type === "success" || type === "error") {
-    feedbackBox.classList.add(type);
+function setFeedback(tone, icon, title, detail) {
+  els.feedbackBox.className = `feedback-box ${tone}`;
+  els.feedbackIcon.textContent = icon;
+  els.feedbackTitle.textContent = title;
+  els.feedbackDetail.textContent = detail;
+}
+
+function triggerPenaltyToast() {
+  els.timerPenaltyToast.classList.remove("pop");
+  void els.timerPenaltyToast.offsetWidth;
+  els.timerPenaltyToast.classList.add("pop");
+}
+
+function renderTimer(snapshot) {
+  const { timeLeft, totalTime, currentPhase } = snapshot;
+  els.timerDisplay.textContent = formatClock(timeLeft);
+
+  const pct = Math.max(0, (timeLeft / totalTime) * 100);
+  els.timerBarFill.style.width = `${pct}%`;
+
+  const phaseText =
+    currentPhase === "easy"
+      ? "Phase 1 · Easy"
+      : currentPhase === "medium"
+        ? "Phase 2 · Medium"
+        : "Phase 3 · Hard";
+  els.phaseIndicator.textContent = phaseText;
+
+  els.timerBarFill.classList.remove("phase-medium", "phase-hard");
+  els.timerDisplay.classList.remove("phase-medium", "phase-hard", "critical");
+
+  if (currentPhase === "medium") {
+    els.timerBarFill.classList.add("phase-medium");
+    els.timerDisplay.classList.add("phase-medium");
+  } else if (currentPhase === "hard") {
+    els.timerBarFill.classList.add("phase-hard");
+    els.timerDisplay.classList.add("phase-hard");
+  }
+
+  if (timeLeft <= 15 && snapshot.gameRunning) {
+    els.timerDisplay.classList.add("critical");
   }
 }
 
-function renderLives(current, max) {
-  livesDisplay.innerHTML = "";
-  for (let i = 0; i < max; i++) {
-    const heart = document.createElement("span");
-    heart.textContent = "♥";
-    heart.className = i < current ? "heart-active" : "heart-lost";
-    livesDisplay.appendChild(heart);
+function renderAttempts(snapshot) {
+  els.attemptsDisplay.innerHTML = "";
+  for (let i = 0; i < snapshot.maxAttempts; i++) {
+    const dot = document.createElement("span");
+    dot.className =
+      i < snapshot.attemptsLeft ? "attempt-dot active" : "attempt-dot used";
+    els.attemptsDisplay.appendChild(dot);
   }
 }
 
-function renderHUD(snapshot) {
-  roundDisplay.textContent = `${snapshot.roundNumber} / ${snapshot.totalRounds}`;
-  scoreDisplay.textContent = snapshot.score;
-  highScoreDisplay.textContent = snapshot.highScore;
+function renderHintButtons(snapshot) {
+  els.btnHintFlag.disabled = !snapshot.canUseFlagHint;
+  els.btnHintCapital.disabled = !snapshot.canUseCapitalHint;
+  els.btnHintFlag.classList.toggle("used", snapshot.usedHints.flag);
+  els.btnHintCapital.classList.toggle("used", snapshot.usedHints.capital);
 
-  // Difficulty badge
-  difficultyBadge.textContent = snapshot.currentDifficulty || "READY";
-  difficultyBadge.className = "badge";
-  if (snapshot.currentDifficulty) {
-    difficultyBadge.classList.add(snapshot.currentDifficulty);
+  const hasRevealed = snapshot.usedHints.flag || snapshot.usedHints.capital;
+  els.revealedHints.classList.toggle("hidden", !hasRevealed);
+  els.revealedFlagBox.classList.toggle("hidden", !snapshot.usedHints.flag);
+  els.revealedCapitalBox.classList.toggle("hidden", !snapshot.usedHints.capital);
+}
+
+function renderSnapshot(snapshot) {
+  els.questionBadge.textContent = `Q #${Math.max(1, snapshot.questionNumber)}`;
+  els.scoreValue.textContent = String(snapshot.score);
+  els.solvedCount.textContent = String(snapshot.solvedCount);
+  els.highscoreValue.textContent = String(snapshot.highScore);
+
+  const diff = snapshot.currentQuestion?.difficulty || "easy";
+  els.difficultyBadge.textContent = diff.toUpperCase();
+  els.difficultyBadge.className = `diff-badge diff-${diff}`;
+
+  renderTimer(snapshot);
+  renderAttempts(snapshot);
+
+  els.potentialPoints.textContent = snapshot.questionActive
+    ? `+${snapshot.potentialPoints} pts`
+    : "—";
+
+  if (snapshot.currentQuestion) {
+    els.clueProverb.textContent = `"${snapshot.currentQuestion.proverb}"`;
+    els.cluePerson.textContent = snapshot.currentQuestion.famousPerson;
+    els.clueDish.textContent = snapshot.currentQuestion.dish;
   }
 
-  // Timer text & progress bar
-  timerDisplay.textContent = `${snapshot.timeLeft}s`;
-  const isCritical = snapshot.timeLeft <= 10;
-  timerDisplay.classList.toggle("danger", isCritical);
-  timerBar.classList.toggle("danger", isCritical);
-  timerBar.style.width = `${(snapshot.timeLeft / 30) * 100}%`;
-
-  // Lives & Joker button availability
-  renderLives(snapshot.lives, snapshot.maxLives);
-  jokersLeftEl.textContent = `${snapshot.jokersLeft} left`;
-  flagJokerBtn.disabled = !snapshot.canUseFlagJoker;
-  capitalJokerBtn.disabled = !snapshot.canUseCapitalJoker;
+  renderHintButtons(snapshot);
 }
 
-function renderClues(clues) {
-  clueProverb.textContent = `"${clues.proverb}"`;
-  cluePerson.textContent = clues.famousPerson;
-  clueDish.textContent = clues.dish;
+function setMobilePanelCollapsed(collapsed) {
+  if (!els.cluePanel || !els.btnTogglePanel) return;
+  els.cluePanel.classList.toggle("collapsed", collapsed);
+  els.btnTogglePanel.textContent = collapsed ? "CLUES" : "HIDE";
+  els.btnTogglePanel.setAttribute("aria-expanded", String(!collapsed));
+  globe?.setMobilePanelCollapsed(collapsed);
 }
 
-function clearJokerReveal() {
-  jokerRevealArea.innerHTML = "";
-  jokerRevealArea.classList.add("hidden");
+function resetQuestionUI() {
+  setMobilePanelCollapsed(false);
+  els.revealedFlagBox.innerHTML = "";
+  els.revealedCapitalText.textContent = "";
+  els.revealedHints.classList.add("hidden");
+  els.revealedFlagBox.classList.add("hidden");
+  els.revealedCapitalBox.classList.add("hidden");
+  els.btnNext.classList.add("hidden");
+  setFeedback(
+    "neutral",
+    "◎",
+    "Find the country on the globe",
+    "You have 2 guesses. First miss reveals distance (km) and direction."
+  );
 }
 
-// --- Timer Lifecycle ---
-
-function stopTimer() {
-  if (timerInterval !== null) {
+function stopTimerLoop() {
+  if (timerInterval) {
     clearInterval(timerInterval);
     timerInterval = null;
   }
 }
 
-function startTimer() {
-  stopTimer();
+function startTimerLoop() {
+  stopTimerLoop();
   timerInterval = setInterval(() => {
     const tick = game.tickTimer();
-    const snapshot = game.getSnapshot();
-    renderHUD(snapshot);
+    renderTimer(tick.snapshot);
+    renderHintButtons(tick.snapshot);
 
-    if (tick.timedOut) {
-      stopTimer();
-      globe.highlightCountry(tick.correctCountry.id, "correct");
-      setFeedback(
-        `Time's up! The mystery country was ${tick.correctCountry.name}.`,
-        "error"
-      );
-      showRoundTransition(tick.gameOver);
+    if (tick.gameOver) {
+      stopTimerLoop();
+      if (tick.timedOutCountry) {
+        globe.markCountry(tick.timedOutCountry.id, "correct");
+      }
+      openGameOverModal(tick.snapshot, "Time's up! Your 2-minute run has finished.");
     }
   }, 1000);
 }
 
-// --- Round & Game Over Flow ---
+function handleStartGame() {
+  stopTimerLoop();
+  els.startModal.classList.add("hidden");
+  els.gameoverModal.classList.add("hidden");
 
-function showRoundTransition(isGameOver) {
-  nextRoundBtn.textContent = isGameOver ? "View Final Results →" : "Next Round →";
-  nextRoundBtn.classList.remove("hidden");
+  globe.stopIdleSpin();
+  globe.clearHighlights();
+  globe.setInteractive(true);
+
+  const snapshot = game.startNewGame();
+  resetQuestionUI();
+  renderSnapshot(snapshot);
+  startTimerLoop();
 }
 
-function setupRoundView(snapshot) {
-  globe.resetColors();
-  clearJokerReveal();
-  nextRoundBtn.classList.add("hidden");
-  renderClues(snapshot.currentClues);
-  renderHUD(snapshot);
-  setFeedback("Rotate the globe and click the matching country.");
-  startTimer();
-}
+function handleCountryClick({ id, name, centroid }) {
+  const current = game.getSnapshot().currentQuestion;
+  if (!current) return;
 
-function openGameOverModal() {
-  stopTimer();
-  const snapshot = game.getSnapshot();
+  const targetCoords = globe.getCentroid(current.countryId);
+  const result = game.submitGuess(id, name, centroid, targetCoords);
 
-  gameOverTitle.textContent =
-    snapshot.lives > 0 ? "Expedition Complete!" : "Out of Lives!";
-  finalScoreEl.textContent = snapshot.score;
-  finalHighScoreEl.textContent = snapshot.highScore;
+  if (result.status === "ignored") return;
 
-  roundSummaryList.innerHTML = "";
-  snapshot.roundHistory.forEach((item) => {
-    const li = document.createElement("li");
-    li.className = item.solved ? "solved" : "missed";
-
-    const left = document.createElement("span");
-    left.textContent = `R${item.roundNumber}: ${item.countryName} (${item.difficulty})`;
-
-    const right = document.createElement("span");
-    right.textContent = item.solved
-      ? `+${item.pointsEarned} pts (${item.timeUsed}s)`
-      : `Missed (${item.timeUsed}s)`;
-
-    li.append(left, right);
-    roundSummaryList.appendChild(li);
-  });
-
-  gameOverModal.classList.remove("hidden");
-}
-
-// --- Event Handlers ---
-
-// Event Handler 1: Country polygon click on the 3D globe
-function handleCountryClick(clickedCountry) {
-  if (!game) return;
-  const beforeSnap = game.getSnapshot();
-  if (!beforeSnap.roundActive || beforeSnap.gameOver) return;
-
-  const targetCentroid = globe.getCountryCentroid(beforeSnap.currentTargetId);
-  const result = game.submitGuess(clickedCountry, targetCentroid);
-  const afterSnap = game.getSnapshot();
-  renderHUD(afterSnap);
+  if (result.status === "duplicate") {
+    setFeedback(
+      "info",
+      "!",
+      `Already guessed ${result.clickedName}`,
+      "Try a different country on the globe — no attempt was deducted."
+    );
+    return;
+  }
 
   if (result.status === "correct") {
-    stopTimer();
-    globe.highlightCountry(result.targetCountry.id, "correct");
+    globe.markCountry(result.targetCountry.id, "correct");
+    globe.setInteractive(false);
+    globe.focusCountry(result.targetCountry.id);
+
+    const tryLabel = result.attemptsUsed === 1 ? "1st try" : "2nd try";
+    const hintLabel =
+      result.hintsUsed === 0
+        ? "no hints"
+        : `${result.hintsUsed} hint${result.hintsUsed > 1 ? "s" : ""}`;
+
     setFeedback(
-      `Correct! It is ${result.targetCountry.name}. (+${result.pointsEarned} pts)`,
-      "success"
+      "correct",
+      "✓",
+      `Correct! ${result.targetCountry.name} (+${result.points} pts)`,
+      `Capital: ${result.targetCountry.capital} · Solved on ${tryLabel} (${hintLabel}).`
     );
-    showRoundTransition(result.gameOver);
+
+    renderSnapshot(result.snapshot);
+    els.btnNext.classList.remove("hidden");
     return;
   }
 
-  if (result.status === "already_guessed") {
-    setFeedback(`You already tried ${result.clickedName}. Try another country!`);
+  if (result.status === "wrong_retry") {
+    globe.markCountry(result.clickedId, "wrong");
+
+    const spatialText =
+      result.distanceKm !== null && result.direction
+        ? `Head ${result.direction.arrow} ${result.direction.label} · approx. ${result.distanceKm.toLocaleString()} km away.`
+        : "Try another region on the globe.";
+
+    setFeedback(
+      "wrong",
+      result.direction ? result.direction.arrow : "✕",
+      `Not ${result.clickedName} — 1 guess left`,
+      spatialText
+    );
+
+    renderSnapshot(result.snapshot);
     return;
   }
 
-  if (result.status === "wrong") {
-    globe.highlightCountry(clickedCountry.id, "wrong");
+  if (result.status === "wrong_failed") {
+    globe.markCountry(result.clickedId, "wrong");
+    globe.markCountry(result.targetCountry.id, "correct");
+    globe.setInteractive(false);
+    globe.focusCountry(result.targetCountry.id);
 
-    if (result.gameOver) {
-      stopTimer();
-      globe.highlightCountry(result.targetCountry.id, "correct");
-      setFeedback(
-        `Wrong (${result.clickedName})! Out of lives. The answer was ${result.targetCountry.name}.`,
-        "error"
-      );
-      showRoundTransition(true);
-    } else {
-      const spatialHint =
-        result.distanceKm !== null && result.direction
-          ? ` It is ${result.distanceKm.toLocaleString()} km away — go ${result.direction.label} ${result.direction.arrow}`
-          : "";
-      setFeedback(`Not ${result.clickedName}!${spatialHint}`, "error");
-    }
+    setFeedback(
+      "wrong",
+      "✕",
+      `Missed! It was ${result.targetCountry.name}`,
+      `Capital: ${result.targetCountry.capital} · Click Next Question to keep going.`
+    );
+
+    renderSnapshot(result.snapshot);
+    els.btnNext.classList.remove("hidden");
   }
 }
 
-// Event Handler 2: Joker buttons (-10s penalty for Flag or Capital)
-function handleJokerClick(type) {
-  const result = game.useJoker(type);
-  if (!result.allowed) return;
+function handleUseHint(type) {
+  const res = game.useHint(type);
+  if (!res.ok) return;
 
-  jokerRevealArea.classList.remove("hidden");
-  const item = document.createElement("div");
-  item.className = "joker-item";
+  triggerPenaltyToast();
 
   if (type === "flag") {
+    els.revealedFlagBox.innerHTML = "";
     const img = document.createElement("img");
-    img.src = result.value;
+    img.src = `https://flagcdn.com/w80/${res.value}.png`;
     img.alt = "Country flag hint";
-    img.className = "joker-flag-img";
-    const label = document.createElement("span");
-    label.textContent = "Flag revealed (-10s)";
-    item.append(img, label);
-  } else {
-    item.innerHTML = `<strong>Capital:</strong> ${result.value} (-10s)`;
+    els.revealedFlagBox.appendChild(img);
+  } else if (type === "capital") {
+    els.revealedCapitalText.textContent = res.value;
   }
 
-  jokerRevealArea.appendChild(item);
-  renderHUD(game.getSnapshot());
+  renderSnapshot(res.snapshot);
 }
 
-flagJokerBtn.addEventListener("click", () => handleJokerClick("flag"));
-capitalJokerBtn.addEventListener("click", () => handleJokerClick("capital"));
-
-// Event Handler 3: Start, Next Round, Play Again, and Keyboard shortcut (Enter)
-startGameBtn.addEventListener("click", () => {
-  startModal.classList.add("hidden");
-  const snapshot = game.startNewGame();
-  setupRoundView(snapshot);
-});
-
-function advanceFlow() {
-  const snapshot = game.getSnapshot();
-  if (snapshot.gameOver) {
-    nextRoundBtn.classList.add("hidden");
-    openGameOverModal();
-  } else {
-    const nextSnap = game.nextRound();
-    setupRoundView(nextSnap);
+function handleNextQuestion() {
+  const res = game.nextQuestion();
+  if (res.exhausted) {
+    stopTimerLoop();
+    openGameOverModal(
+      res.snapshot,
+      "Unbelievable! You played through all 66 countries before time ran out."
+    );
+    return;
   }
+
+  if (!res.ok) return;
+
+  globe.clearHighlights();
+  globe.setInteractive(true);
+  resetQuestionUI();
+  renderSnapshot(res.snapshot);
 }
 
-nextRoundBtn.addEventListener("click", advanceFlow);
+function openGameOverModal(snapshot, subtitleText) {
+  globe.setInteractive(false);
+  globe.startIdleSpin();
+  els.btnNext.classList.add("hidden");
 
-playAgainBtn.addEventListener("click", () => {
-  gameOverModal.classList.add("hidden");
-  const snapshot = game.startNewGame();
-  setupRoundView(snapshot);
-});
+  const total = snapshot.totalPlayed;
+  const accuracy = total > 0 ? Math.round((snapshot.solvedCount / total) * 100) : 0;
 
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Enter" && !nextRoundBtn.classList.contains("hidden")) {
-    advanceFlow();
+  els.gameoverSubtitle.textContent = subtitleText;
+  els.finalScore.textContent = String(snapshot.score);
+  els.finalHighscore.textContent = String(snapshot.highScore);
+  els.finalSolved.textContent = `${snapshot.solvedCount} / ${total}`;
+  els.finalAccuracy.textContent = `${accuracy}%`;
+  els.newRecordBadge.classList.toggle("hidden", !snapshot.isNewRecord);
+
+  els.summaryList.innerHTML = "";
+  if (snapshot.questionHistory.length === 0) {
+    const emptyLi = document.createElement("li");
+    emptyLi.className = "summary-row";
+    emptyLi.textContent = "No questions completed during this run.";
+    els.summaryList.appendChild(emptyLi);
+  } else {
+    snapshot.questionHistory.forEach((entry) => {
+      const li = document.createElement("li");
+      li.className = "summary-row";
+
+      const left = document.createElement("div");
+      left.className = "summary-row-left";
+
+      const badge = document.createElement("span");
+      badge.className = `diff-badge diff-${entry.difficulty}`;
+      badge.textContent = `Q${entry.questionNumber}`;
+
+      const info = document.createElement("div");
+      const nameEl = document.createElement("div");
+      nameEl.className = "summary-row-name";
+      nameEl.textContent = entry.countryName;
+
+      const metaEl = document.createElement("div");
+      metaEl.className = "summary-row-meta";
+      const statusText = entry.solved
+        ? `Try #${entry.attemptsUsed}`
+        : entry.outcome === "timeout"
+          ? "Timed out"
+          : "Missed";
+      metaEl.textContent = `${statusText} · ${entry.timeSpent}s · ${entry.hintsUsed} hint${entry.hintsUsed === 1 ? "" : "s"}`;
+
+      info.appendChild(nameEl);
+      info.appendChild(metaEl);
+      left.appendChild(badge);
+      left.appendChild(info);
+
+      const pts = document.createElement("span");
+      pts.className = `summary-row-pts mono ${entry.points > 0 ? "pts-win" : "pts-zero"}`;
+      pts.textContent = entry.points > 0 ? `+${entry.points}` : "0";
+
+      li.appendChild(left);
+      li.appendChild(pts);
+      els.summaryList.appendChild(li);
+    });
   }
-});
 
-// --- Bootstrap ---
+  els.gameoverModal.classList.remove("hidden");
+  renderResultsChart(els.resultsChart, snapshot.questionHistory);
+}
+
+function bindEvents() {
+  els.btnStart.addEventListener("click", handleStartGame);
+  els.btnPlayAgain.addEventListener("click", handleStartGame);
+  els.btnNext.addEventListener("click", handleNextQuestion);
+
+  els.btnTogglePanel?.addEventListener("click", () => {
+    const isCollapsed = els.cluePanel.classList.contains("collapsed");
+    setMobilePanelCollapsed(!isCollapsed);
+  });
+
+  els.btnHintFlag.addEventListener("click", () => handleUseHint("flag"));
+  els.btnHintCapital.addEventListener("click", () => handleUseHint("capital"));
+
+  els.btnZoomIn.addEventListener("click", () => globe?.zoomIn());
+  els.btnZoomOut.addEventListener("click", () => globe?.zoomOut());
+  els.btnResetView.addEventListener("click", () => globe?.resetView());
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" || !game) return;
+    const snap = game.getSnapshot();
+    if (snap.gameRunning && !snap.questionActive && !els.btnNext.classList.contains("hidden")) {
+      event.preventDefault();
+      handleNextQuestion();
+    }
+  });
+}
 
 async function init() {
-  const response = await fetch("./data/countries.json");
-  const countries = await response.json();
+  bindEvents();
 
-  game = createGameState(countries);
-  globe = await createGlobe("#globe-container", handleCountryClick);
+  try {
+    const [countriesResponse, globeController] = await Promise.all([
+      fetch("data/countries.json").then((res) => {
+        if (!res.ok) throw new Error("Could not load countries.json");
+        return res.json();
+      }),
+      createGlobe("#globe-svg", { onCountryClick: handleCountryClick })
+    ]);
 
-  highScoreDisplay.textContent = game.getSnapshot().highScore;
-  startGameBtn.textContent = "Start Game";
-  startGameBtn.disabled = false;
+    globe = globeController;
+    game = createGameState(countriesResponse);
+
+    els.highscoreValue.textContent = String(game.getSnapshot().highScore);
+    globe.startIdleSpin();
+
+    els.btnStart.disabled = false;
+    els.btnStart.textContent = "Start 2-Minute Challenge";
+  } catch (err) {
+    console.error("Initialization error:", err);
+    els.btnStart.textContent = "Failed to load game data";
+  }
 }
 
-init().catch((err) => {
-  console.error(err);
-  startGameBtn.textContent = "Failed to Load Data";
-  setFeedback("Initialization error. Please check the browser console (F12).", "error");
-});
+init();

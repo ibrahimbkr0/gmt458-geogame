@@ -1,117 +1,346 @@
-const WORLD_ATLAS_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+/**
+ * CultureGlobe 3D — Interactive D3.js Pixel-Edge Orthographic Globe
+ * Supports desktop drag/wheel + mobile touch drag, 2-finger pinch zoom, and tap guard.
+ */
 
-export async function createGlobe(containerSelector, onCountryClick) {
-  const container = document.querySelector(containerSelector);
-  const size = Math.min(container.clientWidth || 600, container.clientHeight || 600);
-  const baseScale = size * 0.45;
+const WORLD_ATLAS_URL =
+  "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-  // 1. Ortografik (3B küre) projeksiyonu ve yol çizici
-  const projection = d3.geoOrthographic()
-    .scale(baseScale)
-    .translate([size / 2, size / 2])
-    .clipAngle(90)
-    .rotate([-20, -25, 0]); // Başlangıç açısı Avrupa/Akdeniz odaklı
+function normalizeId(id) {
+  return String(id).padStart(3, "0");
+}
 
-  const path = d3.geoPath(projection);
+function getTouchDistance(t1, t2) {
+  return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+}
 
-  // 2. SVG tuvalini oluştur
-  const svg = d3.select(container)
-    .append("svg")
-    .attr("viewBox", `0 0 ${size} ${size}`);
+export async function createGlobe(svgSelector, { onCountryClick }) {
+  const svg = d3.select(svgSelector);
+  const svgNode = svg.node();
 
-  // Okyanus (kürenin arka planı)
-  const ocean = svg.append("path")
-    .datum({ type: "Sphere" })
-    .attr("class", "ocean")
-    .attr("d", path);
-
-  // Enlem-boylam çizgileri (graticule)
-  const graticule = svg.append("path")
-    .datum(d3.geoGraticule10())
-    .attr("class", "graticule")
-    .attr("d", path);
-
-  // 3. Natural Earth dünya poligon verisini çek ve GeoJSON'a dönüştür
   const worldData = await d3.json(WORLD_ATLAS_URL);
-  const countries = topojson.feature(worldData, worldData.objects.countries).features;
+  const countriesGeo = topojson.feature(
+    worldData,
+    worldData.objects.countries
+  ).features;
 
-  // 4. Ülke poligonlarını çiz
-  let isDragging = false;
+  const centroidsById = new Map();
+  countriesGeo.forEach((feature) => {
+    const id = normalizeId(feature.id);
+    centroidsById.set(id, d3.geoCentroid(feature));
+  });
 
-  const countryPaths = svg.append("g")
+  const projection = d3.geoOrthographic().clipAngle(90);
+  const path = d3.geoPath(projection);
+  const graticule = d3.geoGraticule10();
+
+  let baseScale = 320;
+  let currentScale = baseScale;
+  let centerX = 0;
+  let centerY = 0;
+  let interactive = false;
+  let mobilePanelCollapsed = false;
+  let idleTimer = null;
+  let activeFocusTransition = null;
+
+  // Touch & drag guards
+  let isPinching = false;
+  let lastPinchDist = null;
+  let dragStartPos = null;
+  let dragMoved = false;
+  let suppressNextClick = false;
+
+  svg.selectAll("*").remove();
+
+  // Concentric dashed pink pixel orbit ring
+  const orbitRing = svg.append("circle").attr("class", "globe-orbit-ring");
+
+  const oceanPath = svg
+    .append("path")
+    .datum({ type: "Sphere" })
+    .attr("class", "sphere-ocean");
+
+  const graticulePath = svg
+    .append("path")
+    .datum(graticule)
+    .attr("class", "graticule");
+
+  const countriesLayer = svg.append("g").attr("class", "countries-layer");
+
+  const countryPaths = countriesLayer
     .selectAll("path")
-    .data(countries)
+    .data(countriesGeo)
     .join("path")
-    .attr("class", "country")
-    .attr("data-id", (d) => String(d.id).padStart(3, "0"))
-    .attr("d", path)
+    .attr("class", "country locked")
+    .attr("data-id", (d) => normalizeId(d.id))
     .on("click", (event, d) => {
-      if (isDragging) return; // Sürükleme biterken yanlışlıkla tıklama sayılmasını önler
-      const normalizedId = String(d.id).padStart(3, "0");
-      onCountryClick({
-        id: normalizedId,
-        name: d.properties.name,
-        centroid: d3.geoCentroid(d) // [boylam, enlem] — mesafe ve yön hesabı için hazır
-      });
+      if (!interactive || suppressNextClick || isPinching) return;
+      event.stopPropagation();
+      const id = normalizeId(d.id);
+      const name = d.properties?.name || "Unknown";
+      const centroid = centroidsById.get(id) || d3.geoCentroid(d);
+      onCountryClick({ id, name, centroid });
     });
 
-  function redraw() {
-    ocean.attr("d", path);
-    graticule.attr("d", path);
+  function render() {
+    orbitRing
+      .attr("cx", centerX)
+      .attr("cy", centerY)
+      .attr("r", currentScale + 14);
+    oceanPath.attr("d", path);
+    graticulePath.attr("d", path);
     countryPaths.attr("d", path);
   }
 
-  // 5. Fareyle sürükleyerek 3B küreyi döndürme (Event Handler)
-  let dragDistance = 0;
+  function clampScale(scale) {
+    return Math.max(baseScale * 0.78, Math.min(baseScale * 3.8, scale));
+  }
 
-  const drag = d3.drag()
-    .on("start", () => {
-      dragDistance = 0;
-      isDragging = false;
+  function computeLayout(resetScale = false) {
+    const rect = svgNode.getBoundingClientRect();
+    const width = Math.max(300, rect.width || window.innerWidth);
+    const height = Math.max(300, rect.height || window.innerHeight);
+    const isDesktop = width > 1024;
+
+    if (isDesktop) {
+      const panelWidth = Math.min(470, Math.max(410, width * 0.28));
+      const panelRightEdge = 24 + panelWidth;
+      const openWidth = Math.max(340, width - panelRightEdge - 24);
+
+      centerX = panelRightEdge + openWidth * 0.5;
+      centerY = height * 0.54;
+
+      const newBaseScale = Math.min(openWidth * 0.44, height * 0.42);
+      const prevRatio = baseScale > 0 ? currentScale / baseScale : 1;
+      baseScale = Math.max(150, newBaseScale);
+      currentScale = resetScale ? baseScale : clampScale(baseScale * prevRatio);
+    } else {
+      const isPhone = width <= 640;
+      const topSpace = isPhone ? 110 : 138;
+      const bottomSpace = mobilePanelCollapsed
+        ? isPhone
+          ? 128
+          : 145
+        : Math.min(height * 0.47, isPhone ? 360 : 390);
+
+      const availHeight = Math.max(170, height - topSpace - bottomSpace);
+      centerX = width * 0.5;
+      centerY = topSpace + availHeight * 0.5;
+
+      const newBaseScale = Math.min(width * 0.42, availHeight * 0.43);
+      const prevRatio = baseScale > 0 ? currentScale / baseScale : 1;
+      baseScale = Math.max(88, newBaseScale);
+      currentScale = resetScale ? baseScale : clampScale(baseScale * prevRatio);
+    }
+
+    projection.translate([centerX, centerY]).scale(currentScale);
+    render();
+  }
+
+  function cancelFocusTransition() {
+    if (activeFocusTransition) {
+      svg.interrupt("focus-globe");
+      activeFocusTransition = null;
+    }
+  }
+
+  // Single-finger / mouse drag rotation
+  const dragBehavior = d3
+    .drag()
+    .filter((event) => {
+      if (isPinching) return false;
+      if (event.touches && event.touches.length > 1) return false;
+      return !event.ctrlKey && !event.button;
+    })
+    .on("start", (event) => {
+      cancelFocusTransition();
+      dragStartPos = [event.x, event.y];
+      dragMoved = false;
     })
     .on("drag", (event) => {
-      dragDistance += Math.hypot(event.dx, event.dy);
-      if (dragDistance > 4) isDragging = true;
-
-      const rotate = projection.rotate();
-      const sensitivity = 75 / projection.scale(); // Yakınlaştıkça daha hassas döner
-      const nextLon = rotate[0] + event.dx * sensitivity;
-      const nextLat = Math.max(-85, Math.min(85, rotate[1] - event.dy * sensitivity));
-
-      projection.rotate([nextLon, nextLat, rotate[2]]);
-      redraw();
+      if (isPinching || !dragStartPos) return;
+      if (
+        !dragMoved &&
+        Math.hypot(event.x - dragStartPos[0], event.y - dragStartPos[1]) > 6
+      ) {
+        dragMoved = true;
+      }
+      const sensitivity = 72 / projection.scale();
+      const [lon, lat, roll] = projection.rotate();
+      const nextLon = lon + event.dx * sensitivity;
+      const nextLat = Math.max(-82, Math.min(82, lat - event.dy * sensitivity));
+      projection.rotate([nextLon, nextLat, roll || 0]);
+      render();
     })
     .on("end", () => {
-      setTimeout(() => { isDragging = false; }, 0);
+      if (dragMoved) {
+        suppressNextClick = true;
+        setTimeout(() => {
+          suppressNextClick = false;
+        }, 70);
+      }
+      dragStartPos = null;
+      dragMoved = false;
     });
 
-  svg.call(drag);
+  svg.call(dragBehavior);
 
-  // 6. Fare tekerleğiyle yakınlaştırma / uzaklaştırma (küçük ülkeler için)
-  svg.on("wheel", (event) => {
-    event.preventDefault();
-    const zoomFactor = event.deltaY < 0 ? 1.12 : 0.89;
-    const nextScale = Math.max(baseScale * 0.8, Math.min(baseScale * 4, projection.scale() * zoomFactor));
-    projection.scale(nextScale);
-    redraw();
+  // Desktop mouse wheel zoom
+  svg.on(
+    "wheel",
+    (event) => {
+      event.preventDefault();
+      cancelFocusTransition();
+      const zoomFactor = event.deltaY < 0 ? 1.12 : 0.89;
+      currentScale = clampScale(currentScale * zoomFactor);
+      projection.scale(currentScale);
+      render();
+    },
+    { passive: false }
+  );
+
+  // Mobile 2-finger pinch-to-zoom
+  svgNode.addEventListener(
+    "touchstart",
+    (event) => {
+      if (event.touches.length === 2) {
+        isPinching = true;
+        cancelFocusTransition();
+        lastPinchDist = getTouchDistance(event.touches[0], event.touches[1]);
+      }
+    },
+    { passive: true }
+  );
+
+  svgNode.addEventListener(
+    "touchmove",
+    (event) => {
+      if (event.touches.length === 2 && lastPinchDist) {
+        event.preventDefault();
+        const dist = getTouchDistance(event.touches[0], event.touches[1]);
+        const ratio = dist / lastPinchDist;
+        lastPinchDist = dist;
+        currentScale = clampScale(currentScale * ratio);
+        projection.scale(currentScale);
+        render();
+      }
+    },
+    { passive: false }
+  );
+
+  svgNode.addEventListener(
+    "touchend",
+    (event) => {
+      if (event.touches.length < 2) {
+        lastPinchDist = null;
+        if (isPinching) {
+          suppressNextClick = true;
+          setTimeout(() => {
+            isPinching = false;
+            suppressNextClick = false;
+          }, 90);
+        }
+      }
+    },
+    { passive: true }
+  );
+
+  projection.rotate([-18, -22, 0]);
+  computeLayout(true);
+
+  window.addEventListener("resize", () => computeLayout(false));
+  window.addEventListener("orientationchange", () => {
+    setTimeout(() => computeLayout(false), 150);
   });
 
-  // Dışarıya açılan yardımcı kontrol fonksiyonları (Adım 3 ve 4'te kullanacağız)
   return {
-    highlightCountry(countryId, statusClass) {
-      const normalized = String(countryId).padStart(3, "0");
+    getCentroid(id) {
+      return centroidsById.get(normalizeId(id)) || null;
+    },
+
+    markCountry(id, status) {
+      const norm = normalizeId(id);
       countryPaths
-        .filter((d) => String(d.id).padStart(3, "0") === normalized)
-        .classed("correct wrong", false)
-        .classed(statusClass, true);
+        .filter((d) => normalizeId(d.id) === norm)
+        .classed("wrong", status === "wrong")
+        .classed("correct", status === "correct");
     },
-    resetColors() {
-      countryPaths.classed("correct wrong", false);
+
+    clearHighlights() {
+      countryPaths.classed("wrong", false).classed("correct", false);
     },
-    getCountryCentroid(countryId) {
-      const normalized = String(countryId).padStart(3, "0");
-      const feature = countries.find((d) => String(d.id).padStart(3, "0") === normalized);
-      return feature ? d3.geoCentroid(feature) : null;
+
+    setInteractive(enabled) {
+      interactive = Boolean(enabled);
+      countryPaths.classed("locked", !interactive);
+    },
+
+    setMobilePanelCollapsed(collapsed) {
+      mobilePanelCollapsed = Boolean(collapsed);
+      computeLayout(false);
+    },
+
+    focusCountry(id) {
+      const centroid = centroidsById.get(normalizeId(id));
+      if (!centroid) return;
+
+      cancelFocusTransition();
+      const startRotate = projection.rotate();
+      const targetRotate = [
+        -centroid[0],
+        Math.max(-75, Math.min(75, -centroid[1])),
+        0
+      ];
+      const interpolator = d3.interpolate(startRotate, targetRotate);
+
+      activeFocusTransition = svg
+        .transition("focus-globe")
+        .duration(650)
+        .ease(d3.easeCubicOut)
+        .tween("rotate", () => (t) => {
+          projection.rotate(interpolator(t));
+          render();
+        })
+        .on("end interrupt", () => {
+          activeFocusTransition = null;
+        });
+    },
+
+    zoomIn() {
+      cancelFocusTransition();
+      currentScale = clampScale(currentScale * 1.25);
+      projection.scale(currentScale);
+      render();
+    },
+
+    zoomOut() {
+      cancelFocusTransition();
+      currentScale = clampScale(currentScale * 0.8);
+      projection.scale(currentScale);
+      render();
+    },
+
+    resetView() {
+      cancelFocusTransition();
+      currentScale = baseScale;
+      projection.scale(currentScale).rotate([-18, -22, 0]);
+      render();
+    },
+
+    startIdleSpin() {
+      if (idleTimer) return;
+      idleTimer = d3.timer(() => {
+        const [lon, lat, roll] = projection.rotate();
+        projection.rotate([lon + 0.14, lat, roll || 0]);
+        render();
+      });
+    },
+
+    stopIdleSpin() {
+      if (idleTimer) {
+        idleTimer.stop();
+        idleTimer = null;
+      }
     }
   };
 }

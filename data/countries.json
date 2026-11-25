@@ -1,142 +1,398 @@
 [
   {
-    "id": "380",
-    "iso2": "it",
-    "name": "Italy",
-    "capital": "Rome",
-    "difficulty": "easy",
-    "proverbs": [
-      "All roads lead to Rome.",
-      "A calm sea never made a skilled sailor.",
-      "He who goes slowly, goes safely and goes far.",
-      "Love and a cough cannot be hidden.",
-      "At the end of the game, the king and the pawn go into the same box."
-    ],
-    "famousPeople": [
-      "Leonardo da Vinci",
-      "Galileo Galilei",
-      "Michelangelo",
-      "Federico Fellini",
-      "Luciano Pavarotti"
-    ],
-    "dishes": [
-      "Risotto alla Milanese",
-      "Tiramisu",
-      "Spaghetti alla Carbonara",
-      "Lasagna",
-      "Arancini"
-    ]
+    "id": "380", "iso2": "it", "name": "Italy", "capital": "Rome", "difficulty": "easy",
+    "proverbs": ["A calm sea never made a skilled sailor.", "He who goes slowly, goes safely and goes far.", "Love and a cough cannot be hidden.", "At the end of the game, the king and the pawn go into the same box.", "Between saying and doing lies a great sea."],
+    "famousPeople": ["Leonardo da Vinci", "Galileo Galilei", "Michelangelo", "Federico Fellini", "Luciano Pavarotti"],
+    "dishes": ["Risotto alla Milanese", "Tiramisu", "Spaghetti alla Carbonara", "Lasagna", "Arancini"]
   },
   {
-    "id": "392",
-    "iso2": "jp",
-    "name": "Japan",
-    "capital": "Tokyo",
-    "difficulty": "easy",
-    "proverbs": [
-      "Fall seven times, stand up eight.",
-      "Even monkeys fall from trees.",
-      "The nail that sticks out gets hammered down.",
-      "A frog in a well does not know the great ocean.",
-      "One kind word can warm three winter months."
-    ],
-    "famousPeople": [
-      "Hayao Miyazaki",
-      "Akira Kurosawa",
-      "Haruki Murakami",
-      "Katsushika Hokusai",
-      "Shigeru Miyamoto"
-    ],
-    "dishes": [
-      "Ramen",
-      "Okonomiyaki",
-      "Takoyaki",
-      "Tempura",
-      "Matcha Mochi"
-    ]
+    "id": "392", "iso2": "jp", "name": "Japan", "capital": "Tokyo", "difficulty": "easy",
+    "proverbs": ["Fall seven times, stand up eight.", "Even monkeys fall from trees.", "The nail that sticks out gets hammered down.", "A frog in a well does not know the great ocean.", "One kind word can warm three winter months."],
+    "famousPeople": ["Hayao Miyazaki", "Akira Kurosawa", "Haruki Murakami", "Katsushika Hokusai", "Shigeru Miyamoto"],
+    "dishes": ["Ramen", "Okonomiyaki", "Takoyaki", "Tempura", "Matcha Mochi"]
   },
   {
-    "id": "076",
-    "iso2": "br",
-    "name": "Brazil",
-    "capital": "Brasília",
-    "difficulty": "medium",
-    "proverbs": [
-      "A sleeping shrimp gets carried away by the tide.",
-      "Soft water hits hard stone until it drills a hole.",
-      "He who has no dog hunts with a cat.",
-      "The parrot eats the corn, while the parakeet takes the fame.",
-      "He who laughs too fast cries slowly."
-    ],
-    "famousPeople": [
-      "Pelé",
-      "Ayrton Senna",
-      "Paulo Coelho",
-      "Oscar Niemeyer",
-      "Gisele Bündchen"
-    ],
-    "dishes": [
-      "Feijoada",
-      "Pão de Queijo",
-      "Brigadeiro",
-      "Moqueca",
-      "Churrasco"
-    ]
+    "id": "250", "iso2": "fr", "name": "France", "capital": "Paris", "difficulty": "easy",
+    "proverbs": ["Appetite comes while eating.", "Little by little, the bird builds its nest.", "Impossible is not a word in our language.", "The night brings good counsel.", "You cannot make an omelet without breaking eggs."],
+    "famousPeople": ["Victor Hugo", "Claude Monet", "Marie Curie", "Édith Piaf", "Zinedine Zidane"],
+    "dishes": ["Coq au Vin", "Ratatouille", "Bouillabaisse", "Crème Brûlée", "Boeuf Bourguignon"]
   },
   {
-    "id": "818",
-    "iso2": "eg",
-    "name": "Egypt",
-    "capital": "Cairo",
-    "difficulty": "medium",
-    "proverbs": [
-      "Whoever drinks from the Nile will always return.",
-      "Man fears time, yet time fears the pyramids.",
-      "An old friend is worth more than new gold.",
-      "The winds do not always blow as the ships desire.",
-      "He who fears his own shadow cannot walk in the sun."
-    ],
-    "famousPeople": [
-      "Cleopatra",
-      "Naguib Mahfouz",
-      "Umm Kulthum",
-      "Mohamed Salah",
-      "Omar Sharif"
-    ],
-    "dishes": [
-      "Koshari",
-      "Ful Medames",
-      "Molokhia",
-      "Ta'ameya",
-      "Om Ali"
-    ]
+    "id": "840", "iso2": "us", "name": "United States", "capital": "Washington, D.C.", "difficulty": "easy",
+    "proverbs": ["The early bird catches the worm.", "A penny saved is a penny earned.", "Do not count your chickens before they hatch.", "The squeaky wheel gets the grease.", "Actions speak louder than words."],
+    "famousPeople": ["Mark Twain", "Martin Luther King Jr.", "Neil Armstrong", "Aretha Franklin", "Thomas Edison"],
+    "dishes": ["Clam Chowder", "Gumbo", "Biscuits and Gravy", "Jambalaya", "Key Lime Pie"]
   },
   {
-    "id": "604",
-    "iso2": "pe",
-    "name": "Peru",
-    "capital": "Lima",
-    "difficulty": "hard",
-    "proverbs": [
-      "No matter how tall the mountain, the path finds a way around it.",
-      "Do not steal, do not lie, do not be lazy (Inca maxim).",
-      "Into the nest of a sleeping bird blows the wind.",
-      "The condor flies high, yet never forgets to look at the earth.",
-      "A burden shared together does not bend the shoulder."
-    ],
-    "famousPeople": [
-      "Mario Vargas Llosa",
-      "Pachacuti",
-      "Yma Sumac",
-      "Gastón Acurio",
-      "Claudio Pizarro"
-    ],
-    "dishes": [
-      "Ceviche",
-      "Lomo Saltado",
-      "Aji de Gallina",
-      "Anticuchos",
-      "Causa Rellena"
-    ]
+    "id": "826", "iso2": "gb", "name": "United Kingdom", "capital": "London", "difficulty": "easy",
+    "proverbs": ["A watched pot never boils.", "Every cloud has a silver lining.", "A stitch in time saves nine.", "Still waters run deep.", "Do not put all your eggs in one basket."],
+    "famousPeople": ["William Shakespeare", "Isaac Newton", "Charles Darwin", "Jane Austen", "Alan Turing"],
+    "dishes": ["Fish and Chips", "Shepherd's Pie", "Beef Wellington", "Yorkshire Pudding", "Sticky Toffee Pudding"]
+  },
+  {
+    "id": "276", "iso2": "de", "name": "Germany", "capital": "Berlin", "difficulty": "easy",
+    "proverbs": ["The morning hour has gold in its mouth.", "Practice makes the master.", "All beginnings are difficult.", "Better a sparrow in the hand than a pigeon on the roof.", "Lies have short legs."],
+    "famousPeople": ["Albert Einstein", "Ludwig van Beethoven", "Johann Wolfgang von Goethe", "Johannes Gutenberg", "Michael Schumacher"],
+    "dishes": ["Sauerbraten", "Currywurst", "Spätzle", "Pretzel", "Black Forest Cake"]
+  },
+  {
+    "id": "724", "iso2": "es", "name": "Spain", "capital": "Madrid", "difficulty": "easy",
+    "proverbs": ["Into a closed mouth, no flies can enter.", "Tell me who you walk with, and I will tell you who you are.", "A shrimp that falls asleep is swept away by the current.", "To a good listener, few words are needed.", "Even if a monkey dresses in silk, it remains a monkey."],
+    "famousPeople": ["Pablo Picasso", "Miguel de Cervantes", "Salvador Dalí", "Antoni Gaudí", "Rafael Nadal"],
+    "dishes": ["Paella", "Gazpacho", "Tortilla de Patatas", "Churros con Chocolate", "Jamón Ibérico"]
+  },
+  {
+    "id": "156", "iso2": "cn", "name": "China", "capital": "Beijing", "difficulty": "easy",
+    "proverbs": ["A journey of a thousand miles begins with a single step.", "The best time to plant a tree was twenty years ago; the second best time is now.", "Do not be afraid of growing slowly; be afraid only of standing still.", "Dig the well before you are thirsty.", "A diamond cannot be polished without friction."],
+    "famousPeople": ["Confucius", "Sun Tzu", "Li Bai", "Bruce Lee", "Tu Youyou"],
+    "dishes": ["Peking Duck", "Mapo Tofu", "Kung Pao Chicken", "Xiaolongbao", "Hot Pot"]
+  },
+  {
+    "id": "356", "iso2": "in", "name": "India", "capital": "New Delhi", "difficulty": "easy",
+    "proverbs": ["You cannot clap with one hand.", "When you live in the river, do not make an enemy of the crocodile.", "The tree laden with fruit always bends low.", "A guest is akin to God.", "Drops of water together fill the earthen pot."],
+    "famousPeople": ["Mahatma Gandhi", "Rabindranath Tagore", "Srinivasa Ramanujan", "Satyajit Ray", "Sachin Tendulkar"],
+    "dishes": ["Biryani", "Butter Chicken", "Masala Dosa", "Samosa", "Palak Paneer"]
+  },
+  {
+    "id": "076", "iso2": "br", "name": "Brazil", "capital": "Brasília", "difficulty": "easy",
+    "proverbs": ["Soft water strikes hard stone until it drills a hole.", "He who has no dog hunts with a cat.", "The parrot eats the corn, while the parakeet takes the fame.", "From grain to grain, the hen fills its belly.", "A gourd floating downstream never knows what waits ahead."],
+    "famousPeople": ["Pelé", "Ayrton Senna", "Paulo Coelho", "Oscar Niemeyer", "Tom Jobim"],
+    "dishes": ["Feijoada", "Pão de Queijo", "Brigadeiro", "Moqueca", "Açaí na Tigela"]
+  },
+  {
+    "id": "484", "iso2": "mx", "name": "Mexico", "capital": "Mexico City", "difficulty": "easy",
+    "proverbs": ["With a full belly comes a happy heart.", "He who leans against a good tree finds good shade.", "If the sky rains lemons, learn to make lemonade.", "Even the best hunter loses a hare now and then.", "Where there is smoke, fire was lit."],
+    "famousPeople": ["Frida Kahlo", "Diego Rivera", "Octavio Paz", "Guillermo del Toro", "Carlos Santana"],
+    "dishes": ["Tacos al Pastor", "Mole Poblano", "Chiles en Nogada", "Pozole", "Tamales"]
+  },
+  {
+    "id": "818", "iso2": "eg", "name": "Egypt", "capital": "Cairo", "difficulty": "easy",
+    "proverbs": ["Man fears time, yet time fears the pyramids.", "An old friend is worth more than new gold.", "The winds do not always blow as the ships desire.", "He who fears his own shadow cannot walk in the sun.", "A monkey in the eyes of its mother is a gazelle."],
+    "famousPeople": ["Cleopatra", "Naguib Mahfouz", "Umm Kulthum", "Mohamed Salah", "Omar Sharif"],
+    "dishes": ["Koshari", "Ful Medames", "Molokhia", "Ta'ameya", "Om Ali"]
+  },
+  {
+    "id": "792", "iso2": "tr", "name": "Turkey", "capital": "Ankara", "difficulty": "easy",
+    "proverbs": ["Drop by drop, a lake is formed.", "No matter how far you have gone on a wrong road, turn back.", "A cup of coffee is remembered for forty years.", "A rolling stone gathers no moss, yet working iron shines.", "One hand washes the other, and both wash the face."],
+    "famousPeople": ["Mustafa Kemal Atatürk", "Mimar Sinan", "Orhan Pamuk", "Aziz Sancar", "Barış Manço"],
+    "dishes": ["İskender Kebab", "Mantı", "Baklava", "Lahmacun", "Menemen"]
+  },
+  {
+    "id": "300", "iso2": "gr", "name": "Greece", "capital": "Athens", "difficulty": "easy",
+    "proverbs": ["A society grows great when old men plant trees whose shade they shall never sit in.", "One swallow does not bring the spring.", "The beginning is half of the whole.", "Slowly, slowly the sour grape becomes honey.", "Know thyself before judging another."],
+    "famousPeople": ["Aristotle", "Socrates", "Homer", "Maria Callas", "Giannis Antetokounmpo"],
+    "dishes": ["Moussaka", "Souvlaki", "Spanakopita", "Tzatziki", "Loukoumades"]
+  },
+  {
+    "id": "643", "iso2": "ru", "name": "Russia", "capital": "Moscow", "difficulty": "easy",
+    "proverbs": ["Measure seven times, cut once.", "Trust, but verify.", "If you chase two hares, you will catch neither.", "The first pancake always turns out lumpy.", "The quieter you go, the farther you will get."],
+    "famousPeople": ["Leo Tolstoy", "Fyodor Dostoevsky", "Pyotr Ilyich Tchaikovsky", "Yuri Gagarin", "Dmitri Mendeleev"],
+    "dishes": ["Beef Stroganoff", "Pelmeni", "Blini", "Solyanka", "Pirozhki"]
+  },
+  {
+    "id": "124", "iso2": "ca", "name": "Canada", "capital": "Ottawa", "difficulty": "easy",
+    "proverbs": ["A good neighbor is better than a distant cousin.", "You miss every shot you do not take.", "Paddle your own canoe when the river widens.", "Winter always asks what summer has done.", "A canoe cannot move forward if two paddlers row in opposite ways."],
+    "famousPeople": ["Wayne Gretzky", "Margaret Atwood", "Leonard Cohen", "Celine Dion", "Terry Fox"],
+    "dishes": ["Poutine", "Tourtière", "Nanaimo Bar", "Butter Tart", "Bannock"]
+  },
+  {
+    "id": "036", "iso2": "au", "name": "Australia", "capital": "Canberra", "difficulty": "easy",
+    "proverbs": ["We are all visitors to this time and place, just passing through.", "Keep your face to the sunshine and the shadows fall behind.", "A fair go makes mates out of strangers.", "Do not wait for a calm tide to mend your boat.", "Those who lose dreaming are lost."],
+    "famousPeople": ["Steve Irwin", "Cate Blanchett", "Hugh Jackman", "Cathy Freeman", "Tim Winton"],
+    "dishes": ["Lamington", "Meat Pie", "Vegemite on Toast", "Anzac Biscuits", "Barramundi"]
+  },
+  {
+    "id": "410", "iso2": "kr", "name": "South Korea", "capital": "Seoul", "difficulty": "easy",
+    "proverbs": ["Even a sheet of paper is lighter when lifted together.", "Start is half the battle.", "A tiger leaves its hide behind, a person leaves their name.", "Words without feet travel a thousand miles.", "After hardship comes sweetness."],
+    "famousPeople": ["Bong Joon-ho", "King Sejong the Great", "Son Heung-min", "Yuna Kim", "Han Kang"],
+    "dishes": ["Bibimbap", "Kimchi Jjigae", "Bulgogi", "Tteokbokki", "Samgyeopsal"]
+  },
+  {
+    "id": "032", "iso2": "ar", "name": "Argentina", "capital": "Buenos Aires", "difficulty": "easy",
+    "proverbs": ["Brothers must be united, for that is the first law.", "To a barking dog, throw no stone; keep riding.", "Do not trade a horse in the middle of the river.", "A bird in the hand is worth a hundred flying.", "He who gets burned with milk blows even on cold cream."],
+    "famousPeople": ["Lionel Messi", "Diego Maradona", "Jorge Luis Borges", "Astor Piazzolla", "Eva Perón"],
+    "dishes": ["Asado", "Empanadas", "Choripán", "Dulce de Leche Alfajores", "Milanesa Napolitana"]
+  },
+  {
+    "id": "764", "iso2": "th", "name": "Thailand", "capital": "Bangkok", "difficulty": "easy",
+    "proverbs": ["When the water rises, hurry to scoop it.", "Do not ride an elephant just to catch a grasshopper.", "Walk slowly and you will catch a big knife-handle.", "One rotten fish spoils the whole basket.", "Speak silver, stay silent for gold."],
+    "famousPeople": ["Tony Jaa", "Apichatpong Weerasethakul", "Buakaw Banchamek", "Sunthorn Phu", "Lisa Manobal"],
+    "dishes": ["Pad Thai", "Tom Yum Goong", "Green Curry", "Som Tum", "Mango Sticky Rice"]
+  },
+  {
+    "id": "752", "iso2": "se", "name": "Sweden", "capital": "Stockholm", "difficulty": "easy",
+    "proverbs": ["There is no bad weather, only bad clothing.", "Fear less, hope more; eat less, chew more.", "A shared joy is a double joy; a shared sorrow is half a sorrow.", "Better to flee poorly than to fight poorly.", "Who waits for something good never waits too long."],
+    "famousPeople": ["Alfred Nobel", "Ingmar Bergman", "Astrid Lindgren", "Zlatan Ibrahimović", "Carl Linnaeus"],
+    "dishes": ["Köttbullar", "Gravlax", "Smörgåstårta", "Kanelbullar", "Janssons Frestelse"]
+  },
+  {
+    "id": "710", "iso2": "za", "name": "South Africa", "capital": "Pretoria", "difficulty": "easy",
+    "proverbs": ["A person is a person through other people.", "When the roots are deep, there is no reason to fear the wind.", "A roaring lion kills no game.", "Sticks in a bundle are unbreakable.", "However long the night, the dawn will break."],
+    "famousPeople": ["Nelson Mandela", "Desmond Tutu", "Miriam Makeba", "Charlize Theron", "Nadine Gordimer"],
+    "dishes": ["Bobotie", "Bunny Chow", "Biltong", "Boerewors", "Malva Pudding"]
+  },
+  {
+    "id": "620", "iso2": "pt", "name": "Portugal", "capital": "Lisbon", "difficulty": "medium",
+    "proverbs": ["Grain by grain, the hen fills its crop.", "Who does not risk does not eat.", "A barking dog does not bite.", "Water that does not move grows stagnant.", "Behind the mountains there are still more mountains."],
+    "famousPeople": ["Cristiano Ronaldo", "Fernando Pessoa", "Vasco da Gama", "José Saramago", "Amália Rodrigues"],
+    "dishes": ["Pastel de Nata", "Bacalhau à Brás", "Francesinha", "Caldo Verde", "Cozido à Portuguesa"]
+  },
+  {
+    "id": "528", "iso2": "nl", "name": "Netherlands", "capital": "Amsterdam", "difficulty": "medium",
+    "proverbs": ["Tall trees catch much wind.", "Do not sell the bear's skin before the bear is shot.", "Even if you give a monkey a golden ring, it stays an ugly thing.", "Who has butter on their head should stay out of the sun.", "The best captains always stand ashore."],
+    "famousPeople": ["Vincent van Gogh", "Rembrandt van Rijn", "Johan Cruyff", "Johannes Vermeer", "Max Verstappen"],
+    "dishes": ["Stroopwafel", "Bitterballen", "Stamppot", "Poffertjes", "Haring"]
+  },
+  {
+    "id": "616", "iso2": "pl", "name": "Poland", "capital": "Warsaw", "difficulty": "medium",
+    "proverbs": ["Not my circus, not my monkeys.", "A guest in the house is God in the house.", "Without work there are no sweet cakes.", "What is too much is not healthy.", "Hope is the mother of fools, yet every wise soul keeps it."],
+    "famousPeople": ["Frédéric Chopin", "Nicolaus Copernicus", "Robert Lewandowski", "Wisława Szymborska", "Andrzej Wajda"],
+    "dishes": ["Pierogi", "Bigos", "Żurek", "Gołąbki", "Pączki"]
+  },
+  {
+    "id": "578", "iso2": "no", "name": "Norway", "capital": "Oslo", "difficulty": "medium",
+    "proverbs": ["Do not sell the skin before the bear is caught.", "He who whispers lies.", "Many small streams make a great river.", "Even a small hill looks like a mountain to a tiny ant.", "A burnt child shuns the fire."],
+    "famousPeople": ["Edvard Munch", "Henrik Ibsen", "Roald Amundsen", "Magnus Carlsen", "Erling Haaland"],
+    "dishes": ["Fårikål", "Lutefisk", "Brunost Waffles", "Kjøttkaker", "Rømmegrøt"]
+  },
+  {
+    "id": "372", "iso2": "ie", "name": "Ireland", "capital": "Dublin", "difficulty": "medium",
+    "proverbs": ["A good laugh and a long sleep are the two best cures.", "It is in the shelter of each other that people live.", "The longest road out is the shortest road home.", "A silent mouth is sweet to hear.", "Beware the anger of a patient soul."],
+    "famousPeople": ["James Joyce", "Oscar Wilde", "W. B. Yeats", "Samuel Beckett", "Cillian Murphy"],
+    "dishes": ["Colcannon", "Boxty", "Soda Bread", "Coddle", "Seafood Chowder"]
+  },
+  {
+    "id": "756", "iso2": "ch", "name": "Switzerland", "capital": "Bern", "difficulty": "medium",
+    "proverbs": ["Speech is silver, silence is golden.", "No money, no mercenary.", "You cannot have both the five-cent coin and the bread roll.", "Mountains never meet, yet people always do.", "Even the steepest summit is climbed step by step."],
+    "famousPeople": ["Roger Federer", "Carl Jung", "Leonhard Euler", "Jean-Jacques Rousseau", "Le Corbusier"],
+    "dishes": ["Cheese Fondue", "Raclette", "Rösti", "Zürcher Geschnetzeltes", "Bircher Müesli"]
+  },
+  {
+    "id": "040", "iso2": "at", "name": "Austria", "capital": "Vienna", "difficulty": "medium",
+    "proverbs": ["Nothing is eaten as hot as it is cooked.", "When two people argue, the third rejoices.", "Better an egg today than a hen tomorrow.", "Every pot finds its own lid.", "Small gifts preserve long friendships."],
+    "famousPeople": ["Wolfgang Amadeus Mozart", "Gustav Klimt", "Sigmund Freud", "Erwin Schrödinger", "Niki Lauda"],
+    "dishes": ["Wiener Schnitzel", "Apfelstrudel", "Sachertorte", "Kaiserschmarrn", "Tafelspitz"]
+  },
+  {
+    "id": "804", "iso2": "ua", "name": "Ukraine", "capital": "Kyiv", "difficulty": "medium",
+    "proverbs": ["Without a willow and a viburnum tree, there is no homeland.", "The eyes are afraid, yet the hands still do the work.", "A word is not a sparrow; once it flies out, you cannot catch it.", "Measure your coat according to your cloth.", "A friendly word is like a warm spring day."],
+    "famousPeople": ["Taras Shevchenko", "Lesya Ukrainka", "Andriy Shevchenko", "Igor Sikorsky", "Sergey Bubka"],
+    "dishes": ["Borscht", "Varenyky", "Holubtsi", "Deruny", "Syrnyky"]
+  },
+  {
+    "id": "504", "iso2": "ma", "name": "Morocco", "capital": "Rabat", "difficulty": "medium",
+    "proverbs": ["Little by little, the camel enters the cooking pot.", "A bird in the hand is better than ten on the tree.", "He who wants honey must bear the stings of bees.", "Do not open a door you cannot close.", "The tongue has no bone, yet it breaks bones."],
+    "famousPeople": ["Ibn Battuta", "Fatima al-Fihri", "Hicham El Guerrouj", "Tahar Ben Jelloun", "Achraf Hakimi"],
+    "dishes": ["Tagine", "Couscous", "Pastilla", "Harira", "Zaalouk"]
+  },
+  {
+    "id": "404", "iso2": "ke", "name": "Kenya", "capital": "Nairobi", "difficulty": "medium",
+    "proverbs": ["Hurry, hurry has no blessing.", "When elephants fight, it is the grass that suffers.", "Treat the earth well; it was lent to you by your children.", "One finger cannot kill a louse.", "Even the best swimmer can be carried by the river."],
+    "famousPeople": ["Wangari Maathai", "Eliud Kipchoge", "Ngũgĩ wa Thiong'o", "Lupita Nyong'o", "Jomo Kenyatta"],
+    "dishes": ["Nyama Choma", "Ugali", "Sukuma Wiki", "Githeri", "Mandazi"]
+  },
+  {
+    "id": "566", "iso2": "ng", "name": "Nigeria", "capital": "Abuja", "difficulty": "medium",
+    "proverbs": ["A child who washes his hands well may dine with kings.", "Not to know is bad; not to wish to know is worse.", "However far a stream flows, it never forgets its source.", "He who brings kola nut brings life.", "When the moon is not full, the stars shine more brightly."],
+    "famousPeople": ["Chinua Achebe", "Wole Soyinka", "Fela Kuti", "Chimamanda Ngozi Adichie", "Hakeem Olajuwon"],
+    "dishes": ["Jollof Rice", "Egusi Soup", "Suya", "Pounded Yam", "Moi Moi"]
+  },
+  {
+    "id": "231", "iso2": "et", "name": "Ethiopia", "capital": "Addis Ababa", "difficulty": "medium",
+    "proverbs": ["When spider webs unite, they can tie up a lion.", "He who conceals his disease cannot expect to be cured.", "Coffee is our bread.", "Fifty lemons are a load for one person, yet a perfume for fifty.", "A fool and water will go the way they are diverted."],
+    "famousPeople": ["Abebe Bikila", "Haile Gebrselassie", "Mulatu Astatke", "Tirunesh Dibaba", "Afewerk Tekle"],
+    "dishes": ["Doro Wat", "Injera", "Kitfo", "Shiro Wat", "Tibs"]
+  },
+  {
+    "id": "704", "iso2": "vn", "name": "Vietnam", "capital": "Hanoi", "difficulty": "medium",
+    "proverbs": ["When eating a fruit, remember who planted the tree.", "Traveling one day teaches a basketful of wisdom.", "A single tree cannot make a forest, yet three trees together make a high mountain.", "Near ink you turn black; near a lamp you turn bright.", "Failure is the mother of success."],
+    "famousPeople": ["Thích Nhất Hạnh", "Nguyễn Du", "Ngô Bảo Châu", "Trịnh Công Sơn", "Võ Nguyên Giáp"],
+    "dishes": ["Phở", "Bánh Mì", "Bún Chả", "Gỏi Cuốn", "Cơm Tấm"]
+  },
+  {
+    "id": "360", "iso2": "id", "name": "Indonesia", "capital": "Jakarta", "difficulty": "medium",
+    "proverbs": ["Still water often hides deep currents.", "Step by step, a hill becomes a mountain.", "There is no ivory without a crack.", "Like a frog beneath a coconut shell.", "Where the earth is stepped on, there the sky is upheld."],
+    "famousPeople": ["Pramoedya Ananta Toer", "R. A. Kartini", "B. J. Habibie", "Affandi", "Susi Susanti"],
+    "dishes": ["Rendang", "Nasi Goreng", "Satay", "Gado-Gado", "Soto Ayam"]
+  },
+  {
+    "id": "608", "iso2": "ph", "name": "Philippines", "capital": "Manila", "difficulty": "medium",
+    "proverbs": ["He who does not look back to where he came from will never reach his destination.", "If you plant wind, you will harvest a storm.", "No matter how long the procession, it still returns to the church.", "A broom is sturdy because its strands are tightly bound.", "Even a hard stone wears away under steady drops of rain."],
+    "famousPeople": ["José Rizal", "Manny Pacquiao", "Lea Salonga", "Fernando Amorsolo", "Carlos Yulo"],
+    "dishes": ["Adobo", "Sinigang", "Lechon", "Halo-Halo", "Kare-Kare"]
+  },
+  {
+    "id": "364", "iso2": "ir", "name": "Iran", "capital": "Tehran", "difficulty": "medium",
+    "proverbs": ["Do not cut down the tree that gives you shade.", "One hand makes no sound on its own.", "With patience, sour grapes turn into sweet halva.", "A wall has mice, and mice have ears.", "Even if the night is pitch black, morning is near."],
+    "famousPeople": ["Omar Khayyam", "Hafez", "Avicenna", "Abbas Kiarostami", "Maryam Mirzakhani"],
+    "dishes": ["Ghormeh Sabzi", "Fesenjan", "Tahdig", "Chelow Kabab", "Ash Reshteh"]
+  },
+  {
+    "id": "682", "iso2": "sa", "name": "Saudi Arabia", "capital": "Riyadh", "difficulty": "medium",
+    "proverbs": ["Choose the neighbor before the house, and the companion before the road.", "He who fears climbing mountains will live forever in the hollows.", "A camel does not see the crookedness of its own neck.", "Patience is the key to relief.", "The desert teaches you to value every single drop."],
+    "famousPeople": ["Haifaa al-Mansour", "Sultan bin Salman Al Saud", "Ghazi Al-Gosaibi", "Sami Al-Jaber", "Mohammed Abdu"],
+    "dishes": ["Kabsa", "Jareesh", "Mutabbaq", "Saleeg", "Mandi"]
+  },
+  {
+    "id": "170", "iso2": "co", "name": "Colombia", "capital": "Bogotá", "difficulty": "medium",
+    "proverbs": ["Never give papaya—do not leave yourself an easy target.", "Better alone than in bad company.", "To a stubborn mule, give a quiet rider.", "Every rooster crows loudest on its own hillside.", "He who wakes early finds help on the trail."],
+    "famousPeople": ["Gabriel García Márquez", "Fernando Botero", "Shakira", "Carlos Valderrama", "Egan Bernal"],
+    "dishes": ["Bandeja Paisa", "Ajiaco", "Arepas", "Sancocho", "Pandebono"]
+  },
+  {
+    "id": "604", "iso2": "pe", "name": "Peru", "capital": "Lima", "difficulty": "medium",
+    "proverbs": ["No matter how tall the mountain, the path finds a way around it.", "Do not steal, do not lie, do not be lazy.", "Into the nest of a sleeping bird blows the wind.", "The condor flies high, yet never forgets to look at the earth.", "A burden shared together does not bend the shoulder."],
+    "famousPeople": ["Mario Vargas Llosa", "Pachacuti", "Yma Sumac", "Gastón Acurio", "César Vallejo"],
+    "dishes": ["Ceviche", "Lomo Saltado", "Ají de Gallina", "Anticuchos", "Causa Rellena"]
+  },
+  {
+    "id": "152", "iso2": "cl", "name": "Chile", "capital": "Santiago", "difficulty": "medium",
+    "proverbs": ["The cord always breaks at its thinnest thread.", "In a blacksmith's house, the knife is made of wood.", "Little by little, the traveler crosses the high pass.", "Do not ask the elm tree to bear pears.", "Good wine needs no loud crier."],
+    "famousPeople": ["Pablo Neruda", "Gabriela Mistral", "Isabel Allende", "Víctor Jara", "Alexis Sánchez"],
+    "dishes": ["Pastel de Choclo", "Curanto", "Cazuela", "Completo", "Sopaipillas"]
+  },
+  {
+    "id": "192", "iso2": "cu", "name": "Cuba", "capital": "Havana", "difficulty": "medium",
+    "proverbs": ["You cannot cover the sun with a single finger.", "The shrimp that sleeps is carried out by the tide.", "If you do not have a horse, ride your own courage.", "Every palm tree bends in the hurricane, yet stands again.", "He who sings scares his sorrows away."],
+    "famousPeople": ["José Martí", "Celia Cruz", "José Raúl Capablanca", "Compay Segundo", "Alicia Alonso"],
+    "dishes": ["Ropa Vieja", "Moros y Cristianos", "Tostones", "Lechón Asado", "Vaca Frita"]
+  },
+  {
+    "id": "554", "iso2": "nz", "name": "New Zealand", "capital": "Wellington", "difficulty": "medium",
+    "proverbs": ["Turn your face to the sun and the shadows fall behind you.", "Seek the treasure you value most dearly; if you bow your head, let it be to a lofty mountain.", "With your food basket and my food basket, the people will thrive.", "A single frond breaks easily, yet woven flax holds fast.", "Although it is small, it is made of greenstone."],
+    "famousPeople": ["Edmund Hillary", "Ernest Rutherford", "Peter Jackson", "Katherine Mansfield", "Taika Waititi"],
+    "dishes": ["Hāngī", "Pavlova", "Whitebait Fritter", "Hokey Pokey Ice Cream", "Green-Lipped Mussels"]
+  },
+  {
+    "id": "352", "iso2": "is", "name": "Iceland", "capital": "Reykjavik", "difficulty": "hard",
+    "proverbs": ["It will all work out in the end.", "Bare is the back of a brotherless man.", "Better to walk barefoot than without a book.", "Do not praise the day before evening.", "A small spark can awaken a sleeping hearth."],
+    "famousPeople": ["Björk", "Halldór Laxness", "Snorri Sturluson", "Vigdís Finnbogadóttir", "Jóhann Jóhannsson"],
+    "dishes": ["Skyr", "Plokkfiskur", "Kjötsúpa", "Hákarl", "Rúgbrauð"]
+  },
+  {
+    "id": "246", "iso2": "fi", "name": "Finland", "capital": "Helsinki", "difficulty": "hard",
+    "proverbs": ["Even through a grey stone, persistence finds a way.", "Who reaches for the spruce tree tumbles into the juniper.", "Work praises its maker.", "Better a titmouse in the palm than ten on a branch.", "In the sauna, anger melts like snow."],
+    "famousPeople": ["Jean Sibelius", "Alvar Aalto", "Linus Torvalds", "Tove Jansson", "Kimi Räikkönen"],
+    "dishes": ["Karjalanpiirakka", "Lohikeitto", "Poronkäristys", "Kalakukko", "Korvapuusti"]
+  },
+  {
+    "id": "203", "iso2": "cz", "name": "Czechia", "capital": "Prague", "difficulty": "hard",
+    "proverbs": ["As many languages as you know, as many times you are a human being.", "Without work, there are no sweet pastries.", "Golden hands earn bread anywhere.", "Who digs a pit for another falls into it himself.", "A good deed returns when least expected."],
+    "famousPeople": ["Franz Kafka", "Antonín Dvořák", "Milan Kundera", "Alphonse Mucha", "Martina Navratilova"],
+    "dishes": ["Svíčková", "Vepřo Knedlo Zelo", "Trdelník", "Smažený Sýr", "Bramboráky"]
+  },
+  {
+    "id": "348", "iso2": "hu", "name": "Hungary", "capital": "Budapest", "difficulty": "hard",
+    "proverbs": ["More was lost on the battlefield than a single setback.", "Do not look a gift horse in the mouth.", "Whoever searches will eventually find.", "A bird is known by its feathers, a person by their friends.", "Appetite grows when the cauldron simmers."],
+    "famousPeople": ["Franz Liszt", "Ernő Rubik", "Ferenc Puskás", "Béla Bartók", "John von Neumann"],
+    "dishes": ["Goulash", "Lángos", "Chicken Paprikash", "Kürtőskalács", "Töltött Káposzta"]
+  },
+  {
+    "id": "642", "iso2": "ro", "name": "Romania", "capital": "Bucharest", "difficulty": "hard",
+    "proverbs": ["Water passes, yet the stones remain.", "Build your sled in summer and your cart in winter.", "A sweet word brings much closer.", "Good deeds are like seeds sown along the road.", "He who rises early reaches farther."],
+    "famousPeople": ["Nadia Comăneci", "Constantin Brâncuși", "George Enescu", "Gheorghe Hagi", "Mircea Eliade"],
+    "dishes": ["Sarmale", "Mămăligă", "Mici", "Papanași", "Ciorbă de Burtă"]
+  },
+  {
+    "id": "191", "iso2": "hr", "name": "Croatia", "capital": "Zagreb", "difficulty": "hard",
+    "proverbs": ["Praise the sea, yet hold tight to the shore.", "Agreement builds a house, discord tears it down.", "A quiet river hollows out the deepest bank.", "What you sow in youth, you harvest in age.", "An old olive tree still gives oil to patient hands."],
+    "famousPeople": ["Luka Modrić", "Ruđer Bošković", "Ivan Meštrović", "Dražen Petrović", "Janica Kostelić"],
+    "dishes": ["Peka", "Štrukli", "Crni Rižot", "Pašticada", "Fritule"]
+  },
+  {
+    "id": "268", "iso2": "ge", "name": "Georgia", "capital": "Tbilisi", "difficulty": "hard",
+    "proverbs": ["A guest is a gift from God.", "What you give away is yours forever; what you keep is lost.", "A good horse never grows tired on a long road.", "One tree cannot hold back the mountain wind.", "Truth moves slowly, yet it always arrives."],
+    "famousPeople": ["Shota Rustaveli", "Niko Pirosmani", "Nona Gaprindashvili", "Khvicha Kvaratskhelia", "George Balanchine"],
+    "dishes": ["Khachapuri", "Khinkali", "Pkhali", "Lobio", "Churchkhela"]
+  },
+  {
+    "id": "398", "iso2": "kz", "name": "Kazakhstan", "capital": "Astana", "difficulty": "hard",
+    "proverbs": ["A horse is the wings of a rider.", "Where there is unity, there is prosperity.", "Knowledge is an inexhaustible spring.", "A bird returns to the nest where it grew its feathers.", "Respect for elders opens every yurt door."],
+    "famousPeople": ["Abai Qunanbaiuly", "Dimash Qudaibergen", "Gennady Golovkin", "Kurmangazy Sagyrbayuly", "Elena Rybakina"],
+    "dishes": ["Beshbarmak", "Baursak", "Kazy", "Kurt", "Shelpek"]
+  },
+  {
+    "id": "860", "iso2": "uz", "name": "Uzbekistan", "capital": "Tashkent", "difficulty": "hard",
+    "proverbs": ["The guest is greater than your own father.", "A tree flourishes in one place; a stone grows weighty where it rests.", "Even a long caravan follows a single bell.", "Kind words lure even a snake from its burrow.", "A garden blooms when its keeper does not sleep."],
+    "famousPeople": ["Ulugh Beg", "Al-Khwarizmi", "Ali-Shir Nava'i", "Al-Biruni", "Oksana Chusovitina"],
+    "dishes": ["Plov", "Samsa", "Lagman", "Shashlik", "Manti"]
+  },
+  {
+    "id": "496", "iso2": "mn", "name": "Mongolia", "capital": "Ulaanbaatar", "difficulty": "hard",
+    "proverbs": ["A good horse is tested on a long journey; a good friend is tested in hardship.", "It is better to travel and see once than to hear a hundred times.", "The sky has no pillars, yet it never falls.", "Even a distant mountain can be reached by a steady rider.", "A loose rope tangles the whole herd."],
+    "famousPeople": ["Genghis Khan", "Kublai Khan", "Zanabazar", "Jügderdemidiin Gürragchaa", "Hakuhō Shō"],
+    "dishes": ["Buuz", "Khuushuur", "Tsuivan", "Khorkhog", "Suutei Tsai"]
+  },
+  {
+    "id": "524", "iso2": "np", "name": "Nepal", "capital": "Kathmandu", "difficulty": "hard",
+    "proverbs": ["Even the highest peak begins beneath your feet.", "A monkey cannot appreciate the taste of ginger.", "Where there is a will, even stone yields a path.", "Do not forget the bridge after crossing the gorge.", "A lamp sheds no light directly beneath its own base."],
+    "famousPeople": ["Tenzing Norgay", "Laxmi Prasad Devkota", "Pasang Lhamu Sherpa", "Araniko", "Nirmal Purja"],
+    "dishes": ["Dal Bhat", "Momo", "Sel Roti", "Gundruk", "Yomari"]
+  },
+  {
+    "id": "144", "iso2": "lk", "name": "Sri Lanka", "capital": "Sri Jayawardenepura Kotte", "difficulty": "hard",
+    "proverbs": ["A crab only walks straight in its own imagination.", "When the branch bends, the fruit is ripe.", "Do not throw stones at a hive when you have no shelter.", "Even the smallest cinnamon bark perfumes the whole pot.", "A bird perched on a fragile branch trusts its wings, not the twig."],
+    "famousPeople": ["Geoffrey Bawa", "Muttiah Muralitharan", "Kumar Sangakkara", "Michael Ondaatje", "Sirimavo Bandaranaike"],
+    "dishes": ["Kottu Roti", "Appam (Hoppers)", "Pol Sambol", "Lamprais", "Kiribath"]
+  },
+  {
+    "id": "458", "iso2": "my", "name": "Malaysia", "capital": "Kuala Lumpur", "difficulty": "hard",
+    "proverbs": ["Little by little, over time it becomes a mountain.", "Like a frog under a coconut shell, mistaking the dark for the whole sky.", "Heavy loads are carried together; light loads are lifted together.", "If you do not crack the bamboo shoot, you will never taste the core.", "When the river rises, the boat rises with it."],
+    "famousPeople": ["Michelle Yeoh", "Lee Chong Wei", "Jimmy Choo", "P. Ramlee", "Nicol David"],
+    "dishes": ["Nasi Lemak", "Char Kway Teow", "Laksa", "Roti Canai", "Cendol"]
+  },
+  {
+    "id": "400", "iso2": "jo", "name": "Jordan", "capital": "Amman", "difficulty": "hard",
+    "proverbs": ["A tent stands firm only when its pegs hold together.", "Hospitality begins with a smile and a fresh pot of cardamom coffee.", "Ask someone who has walked the road, not just the scholar.", "The stone you reject may become the cornerstone of the arch.", "A quiet brook waters more fields than a sudden flood."],
+    "famousPeople": ["King Hussein", "Queen Rania", "Omar Yaghi", "Ahmad Abughaush", "Mousa Al-Taamari"],
+    "dishes": ["Mansaf", "Maqluba", "Zarb", "Galayet Bandora", "Knafeh"]
+  },
+  {
+    "id": "288", "iso2": "gh", "name": "Ghana", "capital": "Accra", "difficulty": "hard",
+    "proverbs": ["It is not wrong to go back and fetch what you forgot.", "Wisdom is like a baobab tree; no one person can embrace it alone.", "By the time the fool has learned the game, the players have dispersed.", "One head alone does not go into council.", "A bird that flies off the earth and lands on an anthill is still on the ground."],
+    "famousPeople": ["Kofi Annan", "Kwame Nkrumah", "El Anatsui", "Abedi Pele", "Ama Ata Aidoo"],
+    "dishes": ["Fufu", "Waakye", "Banku and Tilapia", "Kelewele", "Red-Red"]
+  },
+  {
+    "id": "686", "iso2": "sn", "name": "Senegal", "capital": "Dakar", "difficulty": "hard",
+    "proverbs": ["A person is the medicine of another person.", "Patience can cook a stone.", "No matter how long a log stays in the river, it never becomes a crocodile.", "He who asks questions does not lose his way.", "The eye sees far, yet it cannot see itself."],
+    "famousPeople": ["Léopold Sédar Senghor", "Youssou N'Dour", "Ousmane Sembène", "Sadio Mané", "Mariama Bâ"],
+    "dishes": ["Thieboudienne", "Yassa Poulet", "Mafé", "Pastels", "Thiakry"]
+  },
+  {
+    "id": "834", "iso2": "tz", "name": "Tanzania", "capital": "Dodoma", "difficulty": "hard",
+    "proverbs": ["Little by little fills the measure.", "Unity is strength; division is weakness.", "A boat does not go forward if each one rows their own way.", "When two bulls lock horns, the grass beneath pays the price.", "An axe forgets, yet the tree remembers."],
+    "famousPeople": ["Julius Nyerere", "Abdulrazak Gurnah", "Freddie Mercury", "Filbert Bayi", "Diamond Platnumz"],
+    "dishes": ["Chipsi Mayai", "Ugali na Maharage", "Zanzibar Pilau", "Mshikaki", "Urojo"]
+  },
+  {
+    "id": "450", "iso2": "mg", "name": "Madagascar", "capital": "Antananarivo", "difficulty": "hard",
+    "proverbs": ["Do not kick away the canoe that helped you cross the river.", "Cross the river in a crowd and the crocodile will not eat you.", "Words are like eggs; once hatched, they grow wings.", "Even a thin thread can mend a wide cloth when doubled.", "Look at the chameleon: one eye on the past, one eye on the future."],
+    "famousPeople": ["Jean-Joseph Rabearivelo", "Queen Ranavalona I", "Erick Manana", "Michèle Rakotoson", "Dama Mahaleo"],
+    "dishes": ["Romazava", "Ravitoto", "Koba", "Mofo Gasy", "Lasary"]
+  },
+  {
+    "id": "788", "iso2": "tn", "name": "Tunisia", "capital": "Tunis", "difficulty": "hard",
+    "proverbs": ["An olive tree planted by your grandfather feeds your grandchildren.", "Do not judge the sea while standing on dry sand.", "If the wind rises, build a windmill rather than a wall.", "A sweet tongue opens iron gates.", "Better a steady lantern than a brief flash of lightning."],
+    "famousPeople": ["Ibn Khaldun", "Hannibal Barca", "Ons Jabeur", "Aboul-Qacem Echebbi", "Oussama Mellouli"],
+    "dishes": ["Brik", "Lablabi", "Shakshuka", "Ojja", "Makroudh"]
+  },
+  {
+    "id": "218", "iso2": "ec", "name": "Ecuador", "capital": "Quito", "difficulty": "hard",
+    "proverbs": ["He who does not dare to cross the mist never sees the summit.", "Every volcano sleeps until its own hour.", "Good cacao takes patience before it becomes sweet.", "The condor needs both wings to ride the valley wind.", "Small seeds grow tall when the rain is shared."],
+    "famousPeople": ["Oswaldo Guayasamín", "Richard Carapaz", "Jefferson Pérez", "Antonio Valencia", "Manuela Sáenz"],
+    "dishes": ["Encebollado", "Llapingachos", "Seco de Chivo", "Fanesca", "Bolón de Verde"]
+  },
+  {
+    "id": "858", "iso2": "uy", "name": "Uruguay", "capital": "Montevideo", "difficulty": "hard",
+    "proverbs": ["Even the longest road begins outside your front gate.", "Do not rush the kettle when sharing mate with friends.", "A good horse knows its rider by the lightness of the hand.", "Storms pass quickly over open plains.", "Quiet water mirrors the clearest sky."],
+    "famousPeople": ["Eduardo Galeano", "Mario Benedetti", "Luis Suárez", "Diego Forlán", "Joaquín Torres-García"],
+    "dishes": ["Chivito", "Torta Frita", "Asado de Tira", "Chajá", "Fainá"]
+  },
+  {
+    "id": "068", "iso2": "bo", "name": "Bolivia", "capital": "Sucre", "difficulty": "hard",
+    "proverbs": ["The mountain does not hurry, yet rivers carve their paths from it.", "Share your salt and you will never travel alone.", "A llama carries only what its stride can bear.", "High air clears the mind and steadies the step.", "Weave two threads together and the poncho lasts a lifetime."],
+    "famousPeople": ["Simón Patiño", "Jaime Escalante", "Juana Azurduy", "Adela Zamudio", "Marco Etcheverry"],
+    "dishes": ["Salteñas", "Pique Macho", "Silpancho", "Sopa de Maní", "Cuñapé"]
   }
 ]
